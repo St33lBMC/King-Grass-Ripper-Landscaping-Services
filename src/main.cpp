@@ -3,6 +3,13 @@
 #include <stdlib.h>
 #include <iostream>
 
+//borrowed shader/obj parsing
+#include "shader.h"
+#include "objloader.h"
+
+//arbitrary model class
+#include "objmodel.h"
+
 
 // Include glew, GLFW, glm
 #include <GL/glew.h>
@@ -16,14 +23,13 @@ GLuint compile_shaders() {
 	return 0;
 }
 
-int main( void )
-{
+GLFWwindow* initialize() {
 	// Initialize GLFW
 	if( !glfwInit() )
 	{
 		fprintf( stderr, "Failed to initialize GLFW\n" );
 		getchar();
-		return -1;
+		exit(-1);
 	}
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
@@ -38,7 +44,7 @@ int main( void )
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
 		glfwTerminate();
-		return -1;
+		exit(-1);
 	}
 	glfwMakeContextCurrent(window);
 
@@ -49,6 +55,15 @@ int main( void )
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
+	
+
+	return window;
+}
+
+int main( void )
+{
+	
+    createModel();
 	do{
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
 		glClear( GL_COLOR_BUFFER_BIT );
