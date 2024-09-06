@@ -16,6 +16,8 @@
 #include <GLFW/glfw3.h>
 #include<glm/glm.hpp>
 
+#include "gl_wrapper/shader/Shader.h"
+
 
 GLFWwindow* window;
 
