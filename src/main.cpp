@@ -1,12 +1,20 @@
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 
-// Include GLFW
+// Include glew, GLFW, glm
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include<glm/glm.hpp>
+
+
 GLFWwindow* window;
 
+GLuint compile_shaders() {
+	return 0;
+}
 
 int main( void )
 {
@@ -25,7 +33,7 @@ int main( void )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1024, 768, "Tutorial 01", NULL, NULL);
+	window = glfwCreateWindow( 1024, 768, "balls 01", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
