@@ -9,5 +9,12 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 
-add_executable(kinggrassripper src/main.cpp)
+include_directories("src/")
+
+add_executable(kinggrassripper 
+    src/main.cpp
+    src/gl_wrapper/shader/Shader.cpp
+)
+
+
 target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew)
