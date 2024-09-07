@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace gl_wrapper::Shader {
+namespace gl_wrapper::shader {
 
 	enum class ShaderType : GLenum {
 		Vertex = GL_VERTEX_SHADER,
@@ -136,4 +136,4 @@ namespace gl_wrapper::Shader {
 			int32_t get_info(ProgramIV var);
 	};
 
-}; // namespace gl_wrapper::Shader
+}; // namespace gl_wrapper::shader

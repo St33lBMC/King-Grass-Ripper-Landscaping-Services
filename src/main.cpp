@@ -1,23 +1,23 @@
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <iostream>
 
 //borrowed shader/obj parsing
-#include "shader.h"
 #include "objloader.h"
+#include "shader.h"
 
 //arbitrary model class
 #include "objmodel.h"
 
-
 // Include glew, GLFW, glm
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include<glm/glm.hpp>
+
+#include <glm/glm.hpp>
 
 #include "gl_wrapper/shader/Shader.h"
-
 
 GLFWwindow* window;
 
@@ -27,30 +27,33 @@ GLuint compile_shaders() {
 
 GLFWwindow* initialize() {
 	// Initialize GLFW
-	if( !glfwInit() )
-	{
-		fprintf( stderr, "Failed to initialize GLFW\n" );
+	if (!glfwInit()) {
+		fprintf(stderr, "Failed to initialize GLFW\n");
 		getchar();
 		exit(-1);
 	}
 
-
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make macOS happy; should not be needed
+	glfwWindowHint(
+		GLFW_OPENGL_FORWARD_COMPAT,
+		GL_TRUE
+	); // To make macOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1024, 768, "balls 01", NULL, NULL);
-	if( window == NULL ){
-		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
+	window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
+	if (window == NULL) {
+		fprintf(
+			stderr,
+			"Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n"
+		);
 		getchar();
 		glfwTerminate();
 		exit(-1);
 	}
 	glfwMakeContextCurrent(window);
-
 
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
@@ -61,29 +64,26 @@ GLFWwindow* initialize() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	
-
 	return window;
 }
 
-int main( void )
-{
+int main(void) {
 	GLFWwindow* window = initialize();
-	
-    createModel();
-	do{
+
+	createModel();
+	do {
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
-		glClear( GL_COLOR_BUFFER_BIT );
+		glClear(GL_COLOR_BUFFER_BIT);
 		// Draw nothing, see you in tutorial 2 !
 		drawModel();
-		
+
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-		   glfwWindowShouldClose(window) == 0 );
+	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS
+		   && glfwWindowShouldClose(window) == 0);
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
