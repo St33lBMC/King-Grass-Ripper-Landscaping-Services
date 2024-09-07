@@ -1,7 +1,3 @@
-# Blender3D v249 OBJ File: untitled.blend
-# www.blender3d.org
-# "borrowed" from https://github.com/opengl-tutorials/ogl/blob/master/tutorial07_model_loading/cube.obj
-mtllib cube.mtl
 v 1.000000 -1.000000 -1.000000
 v 1.000000 -1.000000 1.000000
 v -1.000000 -1.000000 1.000000

@@ -12,7 +12,7 @@ std::vector<glm::vec3> normals;
 
 void createModel()
 {
-    bool res = loadOBJ("cube.obj", vertices, uvs, normals);
+    bool res = loadOBJ("../src/cube.obj", vertices, uvs, normals);
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);

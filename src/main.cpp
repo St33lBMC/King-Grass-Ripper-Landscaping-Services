@@ -34,6 +34,7 @@ GLFWwindow* initialize() {
 		exit(-1);
 	}
 
+
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -57,6 +58,9 @@ GLFWwindow* initialize() {
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
+	glewExperimental = GL_TRUE;
+	glewInit();
+
 	
 
 	return window;
@@ -64,6 +68,7 @@ GLFWwindow* initialize() {
 
 int main( void )
 {
+	GLFWwindow* window = initialize();
 	
     createModel();
 	do{
