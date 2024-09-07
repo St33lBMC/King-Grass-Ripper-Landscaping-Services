@@ -1,15 +1,17 @@
 // Include standard headers
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/scalar_common.hpp>
+#include <glm/ext/scalar_constants.hpp>
 #include <glm/matrix.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
 
 //borrowed shader/obj parsing
 #include "objloader.h"
-#include "shader.h"
 #include "shader.h"
 
 //arbitrary model class
@@ -20,6 +22,7 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "gl_wrapper/shader/Shader.h"
 
@@ -32,6 +35,10 @@ float horizontal_angle = 0.0f;
 float vertical_angle = 0.0f;
 float pitch = 0.0f;
 float yaw = 0.0f;
+
+double cursor_x = 0.0;
+double cursor_y = 0.0;
+
 glm::vec3 camera_pos = glm::vec3(0, 0, 0);
 glm::vec3 direction_vector = glm::vec3(0, 0, 0);
 glm::vec3 target_vector = glm::vec3(0, 0, 0);
@@ -52,30 +59,55 @@ void balls(
 	std::cout << message << std::endl;
 }
 
+glm::vec3 compute_right() {
+	return glm::vec3(sin(glm::radians(yaw) - glm::pi<float>() / 2.0), 0.0, cos(glm::radians(yaw) - glm::pi<float>() / 2.0));
+};
+
 void dokeyboardshitmonica() {
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		camera_pos -= camera_speed * direction_vector;
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		camera_pos += camera_speed * direction_vector;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		camera_pos.x -= 0.1;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		camera_pos += camera_speed * compute_right();
 	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		camera_pos.x += 0.1;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		camera_pos -= camera_speed * compute_right(); 
 	}
-	double cursor_x = 0.0;
-	double cursor_y = 0.0;
-	glfwGetCursorPos(window, &cursor_x, &cursor_y);
-	direction_vector.x = glm::cos(glm::radians(pitch) * glm::radians(yaw));
-	std::cout << cursor_x << " balls, even " << cursor_y << std::endl;
+	double new_cursor_x = 0.0;
+	double new_cursor_y = 0.0;
+	glfwGetCursorPos(window, &new_cursor_x, &new_cursor_y);
+
+	double x_delta = new_cursor_x - cursor_x;
+	double y_delta = new_cursor_y - cursor_y;
+
+	cursor_x = new_cursor_x;
+	cursor_y = new_cursor_y;
+
+	// pitch = 0.0;
+	// yaw = 0.0;
+
+	pitch += y_delta * 0.1;
+	yaw += x_delta * 0.1;
+
+	pitch = glm::min(pitch, 180.0f);
+	pitch = glm::max(pitch, -180.0f);
+
+
+	
+	direction_vector.x = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+	direction_vector.y = sin(glm::radians(pitch));
+	direction_vector.z = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+	direction_vector = glm::normalize(direction_vector);
+
+	
+	std::cout << new_cursor_x << " balls, even " << new_cursor_y << std::endl;
 }
 
 GLFWwindow* initialize() {
 	// Initialize GLFW
-	if (!glfwInit()) {
-		fprintf(stderr, "Failed to initialize GLFW\n");
 	if (!glfwInit()) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		getchar();
@@ -97,12 +129,6 @@ GLFWwindow* initialize() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
-	if (window == NULL) {
-		fprintf(
-			stderr,
-			"Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n"
-		);
 	window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
 	if (window == NULL) {
 		fprintf(
@@ -131,10 +157,12 @@ GLFWwindow* initialize() {
 		LoadShaders("../src/shaders/shader.vs", "../src/shaders/shader.fs");
 	glUseProgram(programID);
 
-	return window;
-}
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-int main(void) {
+	return window;
+};
+
 int main(void) {
 	GLFWwindow* window = initialize();
 	glm::mat4 model_matrix = glm::mat4(1.0);
@@ -165,8 +193,12 @@ int main(void) {
 	do {
 		//do keybord shit monica
 		dokeyboardshitmonica();
+
+		std::cout << "Camera position: " << glm::to_string(camera_pos) << std::endl;
+		std::cout << "Dir. vector: " << glm::to_string(direction_vector) << std::endl;
+
 		view_matrix =
-			glm::lookAt(camera_pos, glm::vec3(3, -2, -4), glm::vec3(0, 1, 0));
+			glm::lookAt(camera_pos, camera_pos + direction_vector, glm::cross(direction_vector, compute_right()));
 		glUniformMatrix4fv(
 			glGetUniformLocation(programID, "view_matrix"),
 			1,
@@ -175,10 +207,8 @@ int main(void) {
 		);
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
 		glClear(GL_COLOR_BUFFER_BIT);
-		glClear(GL_COLOR_BUFFER_BIT);
 		// Draw nothing, see you in tutorial 2 !
 		drawModel();
-
 
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -189,8 +219,6 @@ int main(void) {
 		}
 
 	} // Check if the ESC key was pressed or the window was closed
-	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS
-		   && glfwWindowShouldClose(window) == 0);
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS
 		   && glfwWindowShouldClose(window) == 0);
 
