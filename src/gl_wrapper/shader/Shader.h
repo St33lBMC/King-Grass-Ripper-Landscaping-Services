@@ -46,14 +46,19 @@ namespace gl_wrapper::shader {
 	/// Represents an OpenGL shader instance.
 	class Shader {
 			GLuint m_raw_id;
-
+			bool m_moved_from = false;
 		public:
 			Shader(ShaderType type) {
 				m_raw_id = glCreateShader(std::to_underlying(type));
 			}
 
 			~Shader() {
-				glDeleteShader(m_raw_id);
+				if (!m_moved_from)
+					glDeleteShader(m_raw_id);
+			}
+			Shader(Shader&& other) {
+				other.m_moved_from = true;
+				this->m_raw_id = other.m_raw_id;
 			}
 
 			GLuint raw_id() {
@@ -69,6 +74,8 @@ namespace gl_wrapper::shader {
 			std::string info_log();
 
 			int32_t get_info(ShaderIV var);
+
+
 	};
 
 	enum class ProgramIV : GLenum {
