@@ -10,7 +10,7 @@ std::vector<glm::vec3> vertices;
 std::vector<glm::vec2> uvs;
 std::vector<glm::vec3> normals;
 
-void createmodel()
+void createModel()
 {
     bool res = loadOBJ("cube.obj", vertices, uvs, normals);
 
@@ -38,7 +38,7 @@ void createmodel()
 
 }
 
-void drawmodel() {
+void drawModel() {
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices));
 }
