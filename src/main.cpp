@@ -27,25 +27,22 @@
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
 
-using namespace gl_wrapper;
+#include "utils/Camera.h"
 
+using namespace gl_wrapper;
+using namespace utils;
 //evil globals >:)
 GLFWwindow* window;
 
 shader::Program* program = nullptr;
 
 float camera_speed = 0.1f;
-float horizontal_angle = 0.0f;
-float vertical_angle = 0.0f;
-float pitch = 0.0f;
-float yaw = 0.0f;
+
+Camera camera(glm::vec3(0, 0, 0));
 
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 
-glm::vec3 camera_pos = glm::vec3(0, 0, 0);
-glm::vec3 direction_vector = glm::vec3(0, 0, 0);
-glm::vec3 target_vector = glm::vec3(0, 0, 0);
 
 GLuint compile_shaders() {
 	return 0;
@@ -63,26 +60,18 @@ void balls(
 	std::cout << message << std::endl;
 }
 
-glm::vec3 compute_right() {
-	return glm::vec3(
-		sin(glm::radians(yaw) - glm::pi<float>() / 2.0),
-		0.0,
-		cos(glm::radians(yaw) - glm::pi<float>() / 2.0)
-	);
-};
-
 void dokeyboardshitmonica() {
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		camera_pos -= camera_speed * direction_vector;
+		camera.m_position -= camera_speed * camera.forward();
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		camera_pos += camera_speed * direction_vector;
+		camera.m_position += camera_speed * camera.forward();
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		camera_pos += camera_speed * compute_right();
+		camera.m_position += camera_speed * camera.right();
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		camera_pos -= camera_speed * compute_right();
+		camera.m_position -= camera_speed * camera.right();
 	}
 	double new_cursor_x = 0.0;
 	double new_cursor_y = 0.0;
@@ -97,18 +86,13 @@ void dokeyboardshitmonica() {
 	// pitch = 0.0;
 	// yaw = 0.0;
 
-	pitch += y_delta * 0.1;
-	yaw += x_delta * 0.1;
+	camera.m_pitch += y_delta * 0.1;
+	camera.m_yaw += x_delta * 0.1;
 
-	pitch = glm::min(pitch, 180.0f);
-	pitch = glm::max(pitch, -180.0f);
+	camera.m_pitch = glm::min(camera.m_pitch, 90.0f);
+	camera.m_pitch = glm::max(camera.m_pitch, -90.0f);
 
-	direction_vector.x = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-	direction_vector.y = sin(glm::radians(pitch));
-	direction_vector.z = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-	direction_vector = glm::normalize(direction_vector);
-
-	std::cout << new_cursor_x << " balls, even " << new_cursor_y << std::endl;
+	std::cout << camera.m_pitch << " balls, even " << camera.m_yaw << std::endl;
 }
 
 GLFWwindow* initialize() {
@@ -224,31 +208,17 @@ void main(){
 int main(void) {
 	GLFWwindow* window = initialize();
 	glm::mat4 model_matrix = glm::mat4(1.0);
-	glm::mat4 projection_matrix =
-		glm::perspective(glm::radians(35.0f), 1.0f, 0.1f, 100.0f);
-	glm::mat4 view_matrix =
-		glm::lookAt(camera_pos, glm::vec3(3, -2, -4), glm::vec3(0, 1, 0));
 	model_matrix = glm::translate(model_matrix, glm::vec3(3, -2, -4));
 
 	program->set_uniform("model_matrix", model_matrix);
-	program->set_uniform("projection_matrix", projection_matrix);
-	program->set_uniform("view_matrix", view_matrix);
+	program->set_uniform("projection_matrix", camera.perspective());
+	program->set_uniform("view_matrix", camera.view());
 	createModel();
 	do {
 		//do keybord shit monica
 		dokeyboardshitmonica();
 
-		std::cout << "Camera position: " << glm::to_string(camera_pos)
-				  << std::endl;
-		std::cout << "Dir. vector: " << glm::to_string(direction_vector)
-				  << std::endl;
-
-		view_matrix = glm::lookAt(
-			camera_pos,
-			camera_pos + direction_vector,
-			glm::cross(direction_vector, compute_right())
-		);
-		program->set_uniform("view_matrix", view_matrix);
+		program->set_uniform("view_matrix", camera.view());
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
 		glClear(GL_COLOR_BUFFER_BIT);
 		// Draw nothing, see you in tutorial 2 !
