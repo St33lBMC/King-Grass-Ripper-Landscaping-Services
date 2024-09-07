@@ -12,17 +12,21 @@ std::vector<glm::vec3> normals;
 
 void createModel()
 {
+	
     bool res = loadOBJ("../src/cube.obj", vertices, uvs, normals);
-
+	std::cout << "balls and cock " << vertices.size() << std::endl;
+	for(int i = 0; i < vertices.size(); i++) {
+		std::cout << vertices.at(i).x << " " << vertices.at(i).y << " " << vertices.at(i).z << std::endl;
+	}
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	unsigned int handle[4];
-	glGenBuffers(4, handle);
+	unsigned int handle[3];
+	glGenBuffers(3, handle);
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-	glVertexAttribPointer((GLuint)0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);  // Vertex position
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
