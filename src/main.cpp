@@ -12,6 +12,9 @@
 #include <iostream>
 
 //borrowed shader/obj parsing
+#include "assets/manager/AssetManager.h"
+#include "assets/provider/FileAssetProvider.h"
+#include "assets/types/TextAsset.h"
 #include "objloader.h"
 
 //arbitrary model class
@@ -23,10 +26,10 @@
 
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <memory>
 
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
-
 #include "utils/Camera.h"
 
 using namespace gl_wrapper;
@@ -42,7 +45,6 @@ Camera camera(glm::vec3(0, 0, 0));
 
 double cursor_x = 0.0;
 double cursor_y = 0.0;
-
 
 GLuint compile_shaders() {
 	return 0;
@@ -92,10 +94,15 @@ void dokeyboardshitmonica() {
 	camera.m_pitch = glm::min(camera.m_pitch, 90.0f);
 	camera.m_pitch = glm::max(camera.m_pitch, -90.0f);
 
-	std::cout << camera.m_pitch << " balls, even " << camera.m_yaw << std::endl;
+	// std::cout << camera.m_pitch << " balls, even " << camera.m_yaw << std::endl;
 }
 
 GLFWwindow* initialize() {
+	std::unique_ptr<assets::provider::FileAssetProvider> asset_provider =
+		std::make_unique<assets::provider::FileAssetProvider>("../src/");
+
+	assets::manager::AssetManager manager = assets::manager::AssetManager(std::move(asset_provider));
+
 	// Initialize GLFW
 	if (!glfwInit()) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
@@ -107,14 +114,10 @@ GLFWwindow* initialize() {
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(
-		GLFW_OPENGL_FORWARD_COMPAT,
-		GL_TRUE
-	); // To make macOS happy; should not be needed
-	glfwWindowHint(
-		GLFW_OPENGL_FORWARD_COMPAT,
-		GL_TRUE
-	); // To make macOS happy; should not be needed
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
+				   GL_TRUE); // To make macOS happy; should not be needed
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
+				   GL_TRUE); // To make macOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
@@ -144,47 +147,22 @@ GLFWwindow* initialize() {
 	glDebugMessageCallback(balls, nullptr);
 
 	try {
-				program = new shader::Program();
+		program = new shader::Program();
 
 		auto vertex_shader = shader::Shader(shader::ShaderType::Vertex);
 		auto fragment_shader = shader::Shader(shader::ShaderType::Fragment);
 
-		vertex_shader.upload_shader_source(R"(
-	
-#version 430 core
+		auto vs = manager.get_asset<assets::types::TextAsset>("shaders/shader.vs");
 
-layout (location = 0) in vec3 position;
-
-uniform mat4 model_matrix;
-uniform mat4 projection_matrix;
-uniform mat4 view_matrix;
-
-
-void main(void)
-{
-		vec4 pos1 = vec4(position, 1);
-		gl_Position = (projection_matrix * view_matrix * model_matrix * pos1);
-
-}
-)");
+		vertex_shader.upload_shader_source(vs->text());
 
 		vertex_shader.compile_shader();
 
-		fragment_shader.upload_shader_source(R"(
-#version 430 core
+		auto fs = manager.get_asset<assets::types::TextAsset>("shaders/shader.fs");
 
-//in vec2 UV;
-
-//uniform sampler2D myTextureSampler;
-out vec4 color;
-void main(){
-    color = vec4(0.0, 0.0, 1, 1);//texture( myTextureSampler, UV ).rgb;
-}
-)");
-
+		fragment_shader.upload_shader_source(fs->text());
+		
 		fragment_shader.compile_shader();
-
-
 
 		program->link([&](shader::Linking& l) {
 			l.attach_shader(vertex_shader);
@@ -233,8 +211,7 @@ int main(void) {
 		}
 
 	} // Check if the ESC key was pressed or the window was closed
-	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS
-		   && glfwWindowShouldClose(window) == 0);
+	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();

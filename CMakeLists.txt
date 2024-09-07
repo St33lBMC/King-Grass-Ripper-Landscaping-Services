@@ -19,6 +19,8 @@ add_executable(kinggrassripper
     src/objmodel.cpp
     src/objloader.cpp         
     src/utils/Camera.cpp  
+    src/assets/manager/AssetManager.cpp
+    src/assets/provider/FileAssetProvider.cpp
 )
 
 
