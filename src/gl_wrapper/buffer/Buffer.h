@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include <cstddef>
+#include <span>
 
 namespace gl_wrapper::buffer {
 
@@ -31,15 +32,14 @@ namespace gl_wrapper::buffer {
 			}
 
 			template<typename T> void upload_data(
-				T* data,
-				size_t count,
+				std::span<T> data,
 				BufferBindingTarget bind_target,
 				UsageHint usage_hint
 			) {
 				glBufferData(
 					(GLenum)bind_target,
-					sizeof(T) * count,
-					data,
+					sizeof(T) * data.size(),
+					data.data(),
 					(GLenum)usage_hint
 				);
 			}
@@ -55,10 +55,9 @@ namespace gl_wrapper::buffer {
 				Buffer::bind(BufferBindingTarget::ArrayBuffer);
 			}
 
-			void upload_data(T* data, size_t count, UsageHint usage_hint) {
+			void upload_data(std::span<T> data, UsageHint usage_hint) {
 				Buffer::upload_data(
 					data,
-					count,
 					BufferBindingTarget::ArrayBuffer,
 					usage_hint
 				);
