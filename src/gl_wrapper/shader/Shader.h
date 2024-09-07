@@ -36,7 +36,7 @@ namespace gl_wrapper::Shader {
 
 	template<typename T>
 	concept Uniformable = requires(T t) {
-		{ t.upload_uniform(GLint()) };
+		{ upload_uniform(t, GLint()) };
 	};
 
 	/// Represents an OpenGL shader instance.
@@ -118,7 +118,7 @@ namespace gl_wrapper::Shader {
 			template<Uniformable T>
 			void set_uniform(std::string_view location, T uniformable) {
 				use_program();
-				uniformable.upload_uniform(get_uniform_location(location));
+				upload_uniform(uniformable, get_uniform_location(location));
 			}
 
 			GLint get_uniform_location(std::string_view location);
@@ -131,11 +131,9 @@ namespace gl_wrapper::Shader {
 				linking.link();
 			}
 
-
 			std::string info_log();
 
 			int32_t get_info(ProgramIV var);
 	};
-
 
 }; // namespace gl_wrapper::Shader
