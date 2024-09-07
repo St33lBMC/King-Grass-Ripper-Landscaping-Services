@@ -10,6 +10,7 @@
 //borrowed shader/obj parsing
 #include "objloader.h"
 #include "shader.h"
+#include "shader.h"
 
 //arbitrary model class
 #include "objmodel.h"
@@ -75,6 +76,8 @@ GLFWwindow* initialize() {
 	// Initialize GLFW
 	if (!glfwInit()) {
 		fprintf(stderr, "Failed to initialize GLFW\n");
+	if (!glfwInit()) {
+		fprintf(stderr, "Failed to initialize GLFW\n");
 		getchar();
 		exit(-1);
 	}
@@ -87,9 +90,19 @@ GLFWwindow* initialize() {
 		GLFW_OPENGL_FORWARD_COMPAT,
 		GL_TRUE
 	); // To make macOS happy; should not be needed
+	glfwWindowHint(
+		GLFW_OPENGL_FORWARD_COMPAT,
+		GL_TRUE
+	); // To make macOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
+	window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
+	if (window == NULL) {
+		fprintf(
+			stderr,
+			"Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n"
+		);
 	window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
 	if (window == NULL) {
 		fprintf(
@@ -121,6 +134,7 @@ GLFWwindow* initialize() {
 	return window;
 }
 
+int main(void) {
 int main(void) {
 	GLFWwindow* window = initialize();
 	glm::mat4 model_matrix = glm::mat4(1.0);
@@ -161,8 +175,10 @@ int main(void) {
 		);
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
 		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);
 		// Draw nothing, see you in tutorial 2 !
 		drawModel();
+
 
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -173,6 +189,8 @@ int main(void) {
 		}
 
 	} // Check if the ESC key was pressed or the window was closed
+	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS
+		   && glfwWindowShouldClose(window) == 0);
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS
 		   && glfwWindowShouldClose(window) == 0);
 

@@ -5,5 +5,5 @@
 void createModel();
 void drawModel();
 
-extern	GLuint vao;
+extern GLuint vao;
 #endif

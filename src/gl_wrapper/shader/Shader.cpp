@@ -1,6 +1,6 @@
 #include "gl_wrapper/shader/Shader.h"
 
-namespace gl_wrapper::Shader {
+namespace gl_wrapper::shader {
 
 	void Shader::compile_shader() {
 		glCompileShader(m_raw_id);
@@ -87,4 +87,4 @@ namespace gl_wrapper::Shader {
 			glDetachShader(m_program->raw_id(), shader);
 		}
 	}
-}; // namespace gl_wrapper::Shader
+}; // namespace gl_wrapper::shader

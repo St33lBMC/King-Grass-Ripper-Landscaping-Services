@@ -1,9 +1,12 @@
 #include "objmodel.h"
-#include <vector>
+
 #include <GL/glew.h>
+
 #include <glm/glm.hpp>
-#include "objloader.h"
 #include <iostream>
+#include <vector>
+
+#include "objloader.h"
 
 GLuint vao;
 std::vector<glm::vec3> vertices;
@@ -30,21 +33,28 @@ void createModel()
 	glEnableVertexAttribArray(0);  // Vertex position
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-	glBufferData(GL_ARRAY_BUFFER, normals.size()*sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		normals.size() * sizeof(glm::vec3),
+		&normals[0],
+		GL_STATIC_DRAW
+	);
 	glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(1); //normals
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
-	glBufferData(GL_ARRAY_BUFFER, uvs.size()*sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		uvs.size() * sizeof(glm::vec2),
+		&uvs[0],
+		GL_STATIC_DRAW
+	);
 	glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(2); //UVs
 	glBindVertexArray(0);
-
 }
 
 void drawModel() {
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices));
 }
-
-
