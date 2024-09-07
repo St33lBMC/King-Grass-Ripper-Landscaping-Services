@@ -13,7 +13,6 @@
 
 //borrowed shader/obj parsing
 #include "objloader.h"
-#include "shader.h"
 
 //arbitrary model class
 #include "objmodel.h"
