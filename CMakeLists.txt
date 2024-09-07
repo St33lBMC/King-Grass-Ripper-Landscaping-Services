@@ -14,6 +14,8 @@ include_directories("src/")
 add_executable(kinggrassripper 
     src/main.cpp
     src/gl_wrapper/shader/Shader.cpp
+    src/objmodel.cpp
+    src/objloader.cpp
 )
 
 
