@@ -108,14 +108,20 @@ namespace gl_wrapper::shader {
 
 	class Program {
 			GLuint m_raw_id;
-
+			bool m_moved_from;
 		public:
 			Program() {
 				m_raw_id = glCreateProgram();
 			}
 
 			~Program() {
-				glDeleteProgram(m_raw_id);
+				if (!m_moved_from)
+					glDeleteProgram(m_raw_id);
+			}
+
+			Program(Program&& other) {
+				this->m_raw_id = other.m_raw_id;
+				other.m_moved_from = true;
 			}
 
 			GLuint raw_id() {
