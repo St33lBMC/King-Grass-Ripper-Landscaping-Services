@@ -34,23 +34,19 @@
 
 using namespace gl_wrapper;
 using namespace utils;
+
+//constant camera speed (move to camera class?)
+const float camera_speed = 0.1f;
+
 //evil globals >:)
-GLFWwindow* window;
-
+// VVV this one is more evil than most
 shader::Program* program = nullptr;
-
-float camera_speed = 0.1f;
-
-Camera camera(glm::vec3(0, 0, 0));
-
-double cursor_x = 0.0;
-double cursor_y = 0.0;
 
 GLuint compile_shaders() {
 	return 0;
 }
 
-void balls(
+void print_glerror(
 	GLenum source,
 	GLenum type,
 	GLuint id,
@@ -62,7 +58,7 @@ void balls(
 	std::cout << message << std::endl;
 }
 
-void dokeyboardshitmonica() {
+void handle_keypress(GLFWwindow* window, Camera& camera, double& cursor_x, double& cursor_y) {
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		camera.m_position -= camera_speed * camera.forward();
 	}
@@ -85,16 +81,13 @@ void dokeyboardshitmonica() {
 	cursor_x = new_cursor_x;
 	cursor_y = new_cursor_y;
 
-	// pitch = 0.0;
-	// yaw = 0.0;
-
 	camera.m_pitch += y_delta * 0.1;
 	camera.m_yaw += x_delta * 0.1;
 
 	camera.m_pitch = glm::min(camera.m_pitch, 90.0f);
 	camera.m_pitch = glm::max(camera.m_pitch, -90.0f);
 
-	// std::cout << camera.m_pitch << " balls, even " << camera.m_yaw << std::endl;
+	//std::cout << camera.m_pitch << " balls, even " << camera.m_yaw << std::endl;
 }
 
 GLFWwindow* initialize() {
@@ -121,7 +114,7 @@ GLFWwindow* initialize() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
 	if (window == NULL) {
 		fprintf(
 			stderr,
@@ -144,7 +137,7 @@ GLFWwindow* initialize() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(balls, nullptr);
+	glDebugMessageCallback(print_glerror, nullptr);
 
 	try {
 		program = new shader::Program();
@@ -161,7 +154,7 @@ GLFWwindow* initialize() {
 		auto fs = manager.get_asset<assets::types::TextAsset>("shaders/shader.fs");
 
 		fragment_shader.upload_shader_source(fs->text());
-		
+
 		fragment_shader.compile_shader();
 
 		program->link([&](shader::Linking& l) {
@@ -185,21 +178,26 @@ GLFWwindow* initialize() {
 
 int main(void) {
 	GLFWwindow* window = initialize();
+	double cursor_x = 0.0;
+	double cursor_y = 0.0;
+	Camera camera(glm::vec3(0, 0, 0));
 	glm::mat4 model_matrix = glm::mat4(1.0);
-	model_matrix = glm::translate(model_matrix, glm::vec3(3, -2, -4));
+	model_matrix = glm::translate(model_matrix, glm::vec3(0, 0, 0));
 
 	program->set_uniform("model_matrix", model_matrix);
 	program->set_uniform("projection_matrix", camera.perspective());
 	program->set_uniform("view_matrix", camera.view());
 	createModel();
 	do {
-		//do keybord shit monica
-		dokeyboardshitmonica();
+		//handle keypresses to update camera position/direction
+		handle_keypress(window, camera, cursor_x, cursor_y);
 
 		program->set_uniform("view_matrix", camera.view());
-		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
+
+		// Clear the screen.
 		glClear(GL_COLOR_BUFFER_BIT);
-		// Draw nothing, see you in tutorial 2 !
+
+		// Draw model(s)
 		drawModel();
 
 		// Swap buffers
