@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cstdlib>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/scalar_common.hpp>
 #include <glm/ext/scalar_constants.hpp>
@@ -25,10 +26,14 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "gl_wrapper/shader/Shader.h"
+#include "gl_wrapper/shader/UniformImpl.h"
+
+using namespace gl_wrapper;
 
 //evil globals >:)
 GLFWwindow* window;
-GLuint programID;
+
+shader::Program* program = nullptr;
 
 float camera_speed = 0.1f;
 float horizontal_angle = 0.0f;
@@ -60,7 +65,11 @@ void balls(
 }
 
 glm::vec3 compute_right() {
-	return glm::vec3(sin(glm::radians(yaw) - glm::pi<float>() / 2.0), 0.0, cos(glm::radians(yaw) - glm::pi<float>() / 2.0));
+	return glm::vec3(
+		sin(glm::radians(yaw) - glm::pi<float>() / 2.0),
+		0.0,
+		cos(glm::radians(yaw) - glm::pi<float>() / 2.0)
+	);
 };
 
 void dokeyboardshitmonica() {
@@ -74,7 +83,7 @@ void dokeyboardshitmonica() {
 		camera_pos += camera_speed * compute_right();
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		camera_pos -= camera_speed * compute_right(); 
+		camera_pos -= camera_speed * compute_right();
 	}
 	double new_cursor_x = 0.0;
 	double new_cursor_y = 0.0;
@@ -95,14 +104,11 @@ void dokeyboardshitmonica() {
 	pitch = glm::min(pitch, 180.0f);
 	pitch = glm::max(pitch, -180.0f);
 
-
-	
 	direction_vector.x = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
 	direction_vector.y = sin(glm::radians(pitch));
 	direction_vector.z = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
 	direction_vector = glm::normalize(direction_vector);
 
-	
 	std::cout << new_cursor_x << " balls, even " << new_cursor_y << std::endl;
 }
 
@@ -153,9 +159,62 @@ GLFWwindow* initialize() {
 	glewInit();
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(balls, nullptr);
-	programID =
-		LoadShaders("../src/shaders/shader.vs", "../src/shaders/shader.fs");
-	glUseProgram(programID);
+
+	try {
+				program = new shader::Program();
+
+		auto vertex_shader = shader::Shader(shader::ShaderType::Vertex);
+		auto fragment_shader = shader::Shader(shader::ShaderType::Fragment);
+
+		vertex_shader.upload_shader_source(R"(
+	
+#version 430 core
+
+layout (location = 0) in vec3 position;
+
+uniform mat4 model_matrix;
+uniform mat4 projection_matrix;
+uniform mat4 view_matrix;
+
+
+void main(void)
+{
+		vec4 pos1 = vec4(position, 1);
+		gl_Position = (projection_matrix * view_matrix * model_matrix * pos1);
+
+}
+)");
+
+		vertex_shader.compile_shader();
+
+		fragment_shader.upload_shader_source(R"(
+#version 430 core
+
+//in vec2 UV;
+
+//uniform sampler2D myTextureSampler;
+out vec4 color;
+void main(){
+    color = vec4(0.0, 0.0, 1, 1);//texture( myTextureSampler, UV ).rgb;
+}
+)");
+
+		fragment_shader.compile_shader();
+
+
+
+		program->link([&](shader::Linking& l) {
+			l.attach_shader(vertex_shader);
+			l.attach_shader(fragment_shader);
+
+			l.bind_attribute_location("position", 0);
+		});
+		//programID =
+		program->use_program();
+	} catch (shader::ShaderException& e) {
+		std::cerr << "SHADER ERRR: " << e.what() << std::endl;
+		exit(-1);
+	}
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
@@ -171,40 +230,26 @@ int main(void) {
 	glm::mat4 view_matrix =
 		glm::lookAt(camera_pos, glm::vec3(3, -2, -4), glm::vec3(0, 1, 0));
 	model_matrix = glm::translate(model_matrix, glm::vec3(3, -2, -4));
-	glUniformMatrix4fv(
-		glGetUniformLocation(programID, "model_matrix"),
-		1,
-		GL_FALSE,
-		&model_matrix[0][0]
-	);
-	glUniformMatrix4fv(
-		glGetUniformLocation(programID, "projection_matrix"),
-		1,
-		GL_FALSE,
-		&projection_matrix[0][0]
-	);
-	glUniformMatrix4fv(
-		glGetUniformLocation(programID, "view_matrix"),
-		1,
-		GL_FALSE,
-		&view_matrix[0][0]
-	);
+
+	program->set_uniform("model_matrix", model_matrix);
+	program->set_uniform("projection_matrix", projection_matrix);
+	program->set_uniform("view_matrix", view_matrix);
 	createModel();
 	do {
 		//do keybord shit monica
 		dokeyboardshitmonica();
 
-		std::cout << "Camera position: " << glm::to_string(camera_pos) << std::endl;
-		std::cout << "Dir. vector: " << glm::to_string(direction_vector) << std::endl;
+		std::cout << "Camera position: " << glm::to_string(camera_pos)
+				  << std::endl;
+		std::cout << "Dir. vector: " << glm::to_string(direction_vector)
+				  << std::endl;
 
-		view_matrix =
-			glm::lookAt(camera_pos, camera_pos + direction_vector, glm::cross(direction_vector, compute_right()));
-		glUniformMatrix4fv(
-			glGetUniformLocation(programID, "view_matrix"),
-			1,
-			GL_FALSE,
-			&view_matrix[0][0]
+		view_matrix = glm::lookAt(
+			camera_pos,
+			camera_pos + direction_vector,
+			glm::cross(direction_vector, compute_right())
 		);
+		program->set_uniform("view_matrix", view_matrix);
 		// Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
 		glClear(GL_COLOR_BUFFER_BIT);
 		// Draw nothing, see you in tutorial 2 !

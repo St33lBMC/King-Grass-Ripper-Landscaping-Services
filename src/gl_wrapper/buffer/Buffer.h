@@ -1,4 +1,5 @@
 #include <GL/glew.h>
+#include <cstddef>
 
 namespace gl_wrapper::buffer {
 
@@ -31,12 +32,13 @@ namespace gl_wrapper::buffer {
 
 			template<typename T> void upload_data(
 				T* data,
+				size_t count,
 				BufferBindingTarget bind_target,
 				UsageHint usage_hint
 			) {
 				glBufferData(
 					(GLenum)bind_target,
-					sizeof(T),
+					sizeof(T) * count,
 					data,
 					(GLenum)usage_hint
 				);
@@ -46,16 +48,17 @@ namespace gl_wrapper::buffer {
 	template<typename T> class VertexBuffer: Buffer {
 		public:
 			VertexBuffer() : Buffer() {
-				bind(BufferBindingTarget::ArrayBuffer);
+				Buffer::bind(BufferBindingTarget::ArrayBuffer);
 			}
 
 			void bind() {
-				bind(BufferBindingTarget::ArrayBuffer);
+				Buffer::bind(BufferBindingTarget::ArrayBuffer);
 			}
 
-			void upload_data(T& data, UsageHint usage_hint) {
-				this->upload_data(
+			void upload_data(T* data, size_t count, UsageHint usage_hint) {
+				Buffer::upload_data(
 					data,
+					count,
 					BufferBindingTarget::ArrayBuffer,
 					usage_hint
 				);

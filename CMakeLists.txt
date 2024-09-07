@@ -4,6 +4,8 @@ project (KingGrassRipper)
 set(OpenGL_GL_PREFERENCE LEGACY)
 set (CMAKE_CXX_STANDARD 23)
 
+add_compile_options(-Wall -Wextra)
+
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)

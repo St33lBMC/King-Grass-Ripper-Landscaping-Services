@@ -4,8 +4,12 @@
 
 #include <cstdint>
 #include <exception>
+#include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
+
+#include <glm/ext.hpp>
 
 namespace gl_wrapper::shader {
 
@@ -34,9 +38,9 @@ namespace gl_wrapper::shader {
 			}
 	};
 
-	template<typename T>
-	concept Uniformable = requires(T t) {
-		{ upload_uniform(t, GLint()) };
+	template <typename T> void upload_uniform(T value, GLint v);
+	template <> inline void upload_uniform<glm::mat4>(glm::mat4 value, GLint v) {
+		glUniformMatrix4fv(v, 1, GL_FALSE, &value[0][0]);
 	};
 
 	/// Represents an OpenGL shader instance.
@@ -45,7 +49,7 @@ namespace gl_wrapper::shader {
 
 		public:
 			Shader(ShaderType type) {
-				m_raw_id = glCreateShader((GLenum)type);
+				m_raw_id = glCreateShader(std::to_underlying(type));
 			}
 
 			~Shader() {
@@ -115,7 +119,7 @@ namespace gl_wrapper::shader {
 				glUseProgram(m_raw_id);
 			}
 
-			template<Uniformable T>
+			template<typename T>
 			void set_uniform(std::string_view location, T uniformable) {
 				use_program();
 				upload_uniform(uniformable, get_uniform_location(location));
@@ -127,7 +131,6 @@ namespace gl_wrapper::shader {
 				Linking linking(this);
 
 				f(linking);
-
 				linking.link();
 			}
 
@@ -137,3 +140,4 @@ namespace gl_wrapper::shader {
 	};
 
 }; // namespace gl_wrapper::shader
+#include "UniformImpl.h"
