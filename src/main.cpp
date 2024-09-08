@@ -103,10 +103,13 @@ int main(void) {
 	GLFWwindow* window = initialize();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	std::unique_ptr<FileAssetProvider> asset_provider = std::make_unique<FileAssetProvider>("../src/");
-
+	std::vector<ObjectModel*> models;
 	Game game(Window(window), std::move(asset_provider));
-	createModel();
-	game.loop();
+	ObjectModel *cube = new ObjectModel("../src/cube.obj", false);
+	ObjectModel *book = new ObjectModel("../src/book.obj", false);
+	models.push_back(cube);
+	models.push_back(book);
+	game.loop(models);
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 

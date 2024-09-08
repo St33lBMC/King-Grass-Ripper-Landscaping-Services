@@ -29,5 +29,5 @@ class Game {
 		Game(Window&& window, std::unique_ptr<AssetProvider> asset_provider);
 
 		/// Runs the game loop.
-		void loop();
+		void loop(std::vector<ObjectModel*>);
 };
