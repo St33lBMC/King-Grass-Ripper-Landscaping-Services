@@ -1,8 +1,8 @@
-cmake_minimum_required (VERSION 3.0)
-project (KingGrassRipper)
+cmake_minimum_required(VERSION 3.0)
+project(KingGrassRipper)
 
 set(OpenGL_GL_PREFERENCE LEGACY)
-set (CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 23)
 
 add_compile_options(-Wall -Wextra)
 
@@ -13,15 +13,17 @@ find_package(glm REQUIRED)
 
 include_directories("src/")
 
-add_executable(kinggrassripper 
+add_executable(kinggrassripper
     src/main.cpp
     src/gl_wrapper/shader/Shader.cpp
     src/objmodel.cpp
-    src/objloader.cpp         
-    src/utils/Camera.cpp  
+    src/objloader.cpp
+    src/utils/Camera.cpp
     src/assets/manager/AssetManager.cpp
     src/assets/provider/FileAssetProvider.cpp
+    src/utils/Movement.cpp
+    src/utils/Window.cpp
+    src/Game.cpp
 )
-
 
 target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew)

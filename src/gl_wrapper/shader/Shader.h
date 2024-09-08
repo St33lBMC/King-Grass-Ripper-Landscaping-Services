@@ -26,6 +26,7 @@ namespace gl_wrapper::shader {
 		ShaderSrcLen = GL_SHADER_SOURCE_LENGTH,
 	};
 
+
 	class ShaderException: public std::exception {
 		private:
 			std::string m_message;
@@ -33,8 +34,8 @@ namespace gl_wrapper::shader {
 		public:
 			ShaderException(std::string message) : m_message(message) {}
 
-			char* what() {
-				return m_message.data();
+			const char* what() const noexcept override {
+				return m_message.c_str();
 			}
 	};
 
