@@ -11,6 +11,7 @@ namespace gl_wrapper::buffer {
 
 	class Buffer {
 			GLuint m_raw_id;
+			bool m_moved_from = false;
 
 		public:
 			Buffer() {
@@ -18,7 +19,13 @@ namespace gl_wrapper::buffer {
 			}
 
 			~Buffer() {
-				glDeleteBuffers(1, &m_raw_id);
+				if (!m_moved_from)
+					glDeleteBuffers(1, &m_raw_id);
+			}
+
+			Buffer(Buffer&& other) {
+				this->m_raw_id = other.m_raw_id;
+				other.m_moved_from = true;
 			}
 
 			GLuint raw_id() {
