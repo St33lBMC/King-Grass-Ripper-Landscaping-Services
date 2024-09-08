@@ -20,7 +20,7 @@ std::vector<glm::vec3> normals;
 void createModel()
 {
 	
-    bool res = loadOBJ("../src/cat.obj", vertices, uvs, normals);
+    bool res = loadOBJ("../src/book.obj", vertices, uvs, normals);
 	std::cout << "balls and cock " << vertices.size() << std::endl;
 	for(auto vertex : vertices) {
 		std::cout << glm::to_string(vertex) << std::endl;

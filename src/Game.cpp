@@ -3,7 +3,7 @@
 void Game::loop() {
 	do {
 		m_movement.process_movement(m_window, m_camera);
-
+		m_shader_program.set_uniform("model_matrix", glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0)));
 		m_shader_program.set_uniform("view_matrix", m_camera.view());
 
 		// Clear the screen.

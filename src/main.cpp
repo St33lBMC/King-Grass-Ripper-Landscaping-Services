@@ -102,7 +102,7 @@ GLFWwindow* initialize() {
 
 int main(void) {
 	GLFWwindow* window = initialize();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	std::unique_ptr<FileAssetProvider> asset_provider = std::make_unique<FileAssetProvider>("../src/");
 
 	Game game(Window(window), std::move(asset_provider));
