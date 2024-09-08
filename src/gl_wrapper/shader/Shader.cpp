@@ -48,8 +48,6 @@ namespace gl_wrapper::shader {
 		output.resize(len);
 
 		glGetProgramInfoLog(m_raw_id, len, nullptr, output.data());
-		std::cout << "BALLS: " << len << std::endl;
-
 		return output;
 	}
 

@@ -26,7 +26,7 @@ namespace utils {
 	}
 
 	glm::mat4 Camera::perspective() {
-		return glm::perspective(glm::radians(m_fov), m_aspect, 0.0f, 10.0f);
+		return glm::perspective(glm::radians(m_fov), m_aspect, 0.1f, 1000.0f);
 	}
 
 	glm::mat4 Camera::view() {

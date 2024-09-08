@@ -16,7 +16,6 @@ include_directories("src/")
 add_executable(kinggrassripper
     src/main.cpp
     src/gl_wrapper/shader/Shader.cpp
-    src/objmodel.cpp
     src/objloader.cpp
     src/utils/Camera.cpp
     src/assets/manager/AssetManager.cpp
@@ -24,6 +23,8 @@ add_executable(kinggrassripper
     src/utils/Movement.cpp
     src/utils/Window.cpp
     src/Game.cpp
+    src/graphics/Model.cpp
+    src/models/ObjectModel.cpp
 )
 
 target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew)

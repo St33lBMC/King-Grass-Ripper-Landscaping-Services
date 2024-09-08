@@ -7,7 +7,8 @@
 #include "assets/provider/AssetProvider.h"
 #include "assets/types/TextAsset.h"
 #include "gl_wrapper/shader/Shader.h"
-#include "objmodel.h"
+#include "graphics/Model.h"
+#include "models/ObjectModel.h"
 #include "utils/Camera.h"
 #include "utils/Movement.h"
 #include "utils/Window.h"
@@ -29,5 +30,5 @@ class Game {
 		Game(Window&& window, std::unique_ptr<AssetProvider> asset_provider);
 
 		/// Runs the game loop.
-		void loop(std::vector<ObjectModel*>);
+		void loop(std::vector<graphics::Model>);
 };

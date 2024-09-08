@@ -1,25 +1,32 @@
 #include "Game.h"
 
-void Game::loop(std::vector<ObjectModel*> models) {
+#include "graphics/Model.h"
+#include "models/ObjectModel.h"
+
+void Game::loop(std::vector<graphics::Model> models) {
 	do {
 		m_movement.process_movement(m_window, m_camera);
 		m_shader_program.set_uniform("view_matrix", m_camera.view());
 
 		// Clear the screen.
-		glClear(GL_COLOR_BUFFER_BIT);
-		
-		// Draw model(s)
-		m_shader_program.set_uniform(
-			"model_matrix",
-			glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0))
-		);
-		models.at(0)->drawModel();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_shader_program.set_uniform(
-			"model_matrix",
-			glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0))
-		);
-		models.at(1)->drawModel();
+		for (auto& model : models) {
+			model.draw(m_shader_program);
+		}
+
+		// // Draw model(s)
+		// m_shader_program.set_uniform(
+		// 	"model_matrix",
+		// 	glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0))
+		// );
+		// models.at(0).draw();
+
+		// m_shader_program.set_uniform(
+		// 	"model_matrix",
+		// 	glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0))
+		// );
+		// models.at(1).draw();
 
 		/* //todo: loop through each model, set its position matrix and other uniforms, then draw it
 		for(auto model : models) {

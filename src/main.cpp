@@ -7,6 +7,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/scalar_common.hpp>
 #include <glm/ext/scalar_constants.hpp>
+#include <glm/fwd.hpp>
 #include <glm/matrix.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
@@ -16,10 +17,12 @@
 #include "assets/manager/AssetManager.h"
 #include "assets/provider/FileAssetProvider.h"
 #include "assets/types/TextAsset.h"
+#include "graphics/Model.h"
+#include "models/ObjectModel.h"
 #include "objloader.h"
 
 //arbitrary model class
-#include "objmodel.h"
+// #include "objmodel.h"
 
 // Include glew, GLFW, glm
 #include <GL/glew.h>
@@ -28,6 +31,7 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <memory>
+#include <vector>
 
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
@@ -91,6 +95,11 @@ GLFWwindow* initialize() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEPTH_TEST);
+
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+
 	glDebugMessageCallback(print_glerror, nullptr);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -103,13 +112,23 @@ int main(void) {
 	GLFWwindow* window = initialize();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	std::unique_ptr<FileAssetProvider> asset_provider = std::make_unique<FileAssetProvider>("../src/");
-	std::vector<ObjectModel*> models;
+
 	Game game(Window(window), std::move(asset_provider));
-	ObjectModel *cube = new ObjectModel("../src/cube.obj", false);
-	ObjectModel *book = new ObjectModel("../src/book.obj", false);
-	models.push_back(cube);
-	models.push_back(book);
-	game.loop(models);
+	models::ObjectModel cube_obj("../src/cube.obj");
+	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1)));
+	cube_obj.upload_to(cube);
+	cube.transform() = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0));
+
+	models::ObjectModel book_obj("../src/book.obj");
+	graphics::Model book(graphics::Material(glm::vec4(1, 0, 0, 1)));
+	book_obj.upload_to(book);
+	book.transform() = glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0));
+
+	std::vector<graphics::Model> models;
+	models.push_back(std::move(cube));
+	models.push_back(std::move(book));
+
+	game.loop(std::move(models));
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 

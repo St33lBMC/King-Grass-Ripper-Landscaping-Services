@@ -3,7 +3,14 @@
 //in vec2 UV;
 
 //uniform sampler2D myTextureSampler;
+
+struct Material {
+    vec4 colour;
+};
+
+uniform Material material;
+
 out vec4 color;
 void main(){
-    color = vec4(0, 0, 0, 1);//texture( myTextureSampler, UV ).rgb;
+    color = material.colour; //texture( myTextureSampler, UV ).rgb;
 }

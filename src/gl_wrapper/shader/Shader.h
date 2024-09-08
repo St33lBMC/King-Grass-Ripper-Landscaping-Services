@@ -10,6 +10,19 @@
 #include <utility>
 #include <vector>
 
+namespace gl_wrapper::uniforms {
+
+	template<typename T> void upload_uniform(T& value, GLint v);
+
+	template<> inline void upload_uniform<glm::mat4>(glm::mat4& value, GLint v) {
+		glUniformMatrix4fv(v, 1, GL_FALSE, &value[0][0]);
+	};
+
+	template<> inline void upload_uniform<glm::vec4>(glm::vec4& value, GLint v) {
+		glUniform4fv(v, 1, &value[0]);
+	};
+} // namespace gl_wrapper::uniforms
+
 namespace gl_wrapper::shader {
 
 	enum class ShaderType : GLenum { Vertex = GL_VERTEX_SHADER, Fragment = GL_FRAGMENT_SHADER };
@@ -32,12 +45,6 @@ namespace gl_wrapper::shader {
 			const char* what() const noexcept override {
 				return m_message.c_str();
 			}
-	};
-
-	template<typename T> void upload_uniform(T value, GLint v);
-
-	template<> inline void upload_uniform<glm::mat4>(glm::mat4 value, GLint v) {
-		glUniformMatrix4fv(v, 1, GL_FALSE, &value[0][0]);
 	};
 
 	/// Represents an OpenGL shader instance.
@@ -129,7 +136,7 @@ namespace gl_wrapper::shader {
 
 			template<typename T> void set_uniform(std::string_view location, T uniformable) {
 				use_program();
-				upload_uniform(uniformable, get_uniform_location(location));
+				gl_wrapper::uniforms::upload_uniform(uniformable, get_uniform_location(location));
 			}
 
 			GLint get_uniform_location(std::string_view location);
