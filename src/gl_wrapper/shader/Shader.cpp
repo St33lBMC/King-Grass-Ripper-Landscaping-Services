@@ -1,4 +1,5 @@
 #include "gl_wrapper/shader/Shader.h"
+
 #include <iostream>
 #include <utility>
 
@@ -65,7 +66,6 @@ namespace gl_wrapper::shader {
 	void Linking::link() {
 		glLinkProgram(m_program->raw_id());
 
-
 		auto v = m_program->get_info(ProgramIV::LinkStatus);
 		switch (v) {
 			case GL_TRUE:
@@ -76,10 +76,7 @@ namespace gl_wrapper::shader {
 		}
 	}
 
-	void Linking::bind_attribute_location(
-		std::string_view attribute,
-		GLuint location
-	) {
+	void Linking::bind_attribute_location(std::string_view attribute, GLuint location) {
 		glBindAttribLocation(m_program->raw_id(), location, attribute.data());
 	}
 

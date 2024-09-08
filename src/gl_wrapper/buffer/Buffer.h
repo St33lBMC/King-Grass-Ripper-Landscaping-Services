@@ -1,13 +1,11 @@
 #include <GL/glew.h>
+
 #include <cstddef>
 #include <span>
 
 namespace gl_wrapper::buffer {
 
-	enum class BufferBindingTarget : GLenum {
-		ArrayBuffer = GL_ARRAY_BUFFER,
-		IndexBuffer = GL_ELEMENT_ARRAY_BUFFER
-	};
+	enum class BufferBindingTarget : GLenum { ArrayBuffer = GL_ARRAY_BUFFER, IndexBuffer = GL_ELEMENT_ARRAY_BUFFER };
 
 	enum class UsageHint : GLenum { Static = GL_STATIC_DRAW };
 
@@ -31,17 +29,9 @@ namespace gl_wrapper::buffer {
 				glBindBuffer((GLenum)target, m_raw_id);
 			}
 
-			template<typename T> void upload_data(
-				std::span<T> data,
-				BufferBindingTarget bind_target,
-				UsageHint usage_hint
-			) {
-				glBufferData(
-					(GLenum)bind_target,
-					sizeof(T) * data.size(),
-					data.data(),
-					(GLenum)usage_hint
-				);
+			template<typename T>
+			void upload_data(std::span<T> data, BufferBindingTarget bind_target, UsageHint usage_hint) {
+				glBufferData((GLenum)bind_target, sizeof(T) * data.size(), data.data(), (GLenum)usage_hint);
 			}
 	};
 
@@ -56,11 +46,7 @@ namespace gl_wrapper::buffer {
 			}
 
 			void upload_data(std::span<T> data, UsageHint usage_hint) {
-				Buffer::upload_data(
-					data,
-					BufferBindingTarget::ArrayBuffer,
-					usage_hint
-				);
+				Buffer::upload_data(data, BufferBindingTarget::ArrayBuffer, usage_hint);
 			}
 	};
 

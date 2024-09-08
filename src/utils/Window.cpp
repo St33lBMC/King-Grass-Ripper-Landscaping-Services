@@ -1,5 +1,7 @@
 #include "utils/Window.h"
+
 #include <glm/gtc/type_ptr.hpp>
+
 namespace utils {
 
 	Window::~Window() {
@@ -27,7 +29,7 @@ namespace utils {
 	glm::dvec2 Window::cursor_position() {
 		glm::dvec2 position;
 
-        double* ptr = glm::value_ptr(position);
+		double* ptr = glm::value_ptr(position);
 		glfwGetCursorPos(m_raw_window, &ptr[0], &ptr[1]);
 		return position;
 	}

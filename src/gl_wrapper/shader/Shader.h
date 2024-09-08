@@ -4,19 +4,15 @@
 
 #include <cstdint>
 #include <exception>
+#include <glm/ext.hpp>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <glm/ext.hpp>
-
 namespace gl_wrapper::shader {
 
-	enum class ShaderType : GLenum {
-		Vertex = GL_VERTEX_SHADER,
-		Fragment = GL_FRAGMENT_SHADER
-	};
+	enum class ShaderType : GLenum { Vertex = GL_VERTEX_SHADER, Fragment = GL_FRAGMENT_SHADER };
 
 	enum class ShaderIV : GLenum {
 		ShaderType = GL_SHADER_TYPE,
@@ -25,7 +21,6 @@ namespace gl_wrapper::shader {
 		InfoLogLen = GL_INFO_LOG_LENGTH,
 		ShaderSrcLen = GL_SHADER_SOURCE_LENGTH,
 	};
-
 
 	class ShaderException: public std::exception {
 		private:
@@ -39,8 +34,9 @@ namespace gl_wrapper::shader {
 			}
 	};
 
-	template <typename T> void upload_uniform(T value, GLint v);
-	template <> inline void upload_uniform<glm::mat4>(glm::mat4 value, GLint v) {
+	template<typename T> void upload_uniform(T value, GLint v);
+
+	template<> inline void upload_uniform<glm::mat4>(glm::mat4 value, GLint v) {
 		glUniformMatrix4fv(v, 1, GL_FALSE, &value[0][0]);
 	};
 
@@ -48,6 +44,7 @@ namespace gl_wrapper::shader {
 	class Shader {
 			GLuint m_raw_id;
 			bool m_moved_from = false;
+
 		public:
 			Shader(ShaderType type) {
 				m_raw_id = glCreateShader(std::to_underlying(type));
@@ -57,6 +54,7 @@ namespace gl_wrapper::shader {
 				if (!m_moved_from)
 					glDeleteShader(m_raw_id);
 			}
+
 			Shader(Shader&& other) {
 				other.m_moved_from = true;
 				this->m_raw_id = other.m_raw_id;
@@ -75,8 +73,6 @@ namespace gl_wrapper::shader {
 			std::string info_log();
 
 			int32_t get_info(ShaderIV var);
-
-
 	};
 
 	enum class ProgramIV : GLenum {
@@ -99,10 +95,7 @@ namespace gl_wrapper::shader {
 		public:
 			void attach_shader(Shader& shader);
 
-			void bind_attribute_location(
-				std::string_view attribute,
-				GLuint location
-			);
+			void bind_attribute_location(std::string_view attribute, GLuint location);
 
 			void link();
 	};
@@ -110,6 +103,7 @@ namespace gl_wrapper::shader {
 	class Program {
 			GLuint m_raw_id;
 			bool m_moved_from;
+
 		public:
 			Program() {
 				m_raw_id = glCreateProgram();
@@ -133,8 +127,7 @@ namespace gl_wrapper::shader {
 				glUseProgram(m_raw_id);
 			}
 
-			template<typename T>
-			void set_uniform(std::string_view location, T uniformable) {
+			template<typename T> void set_uniform(std::string_view location, T uniformable) {
 				use_program();
 				upload_uniform(uniformable, get_uniform_location(location));
 			}
@@ -154,4 +147,5 @@ namespace gl_wrapper::shader {
 	};
 
 }; // namespace gl_wrapper::shader
+
 #include "UniformImpl.h"

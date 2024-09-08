@@ -86,7 +86,6 @@ GLFWwindow* initialize() {
 
 	//set up keyboardin n shiet
 
-
 	glClearColor(0.82f, 0.875f, 0.933f, 0.0f);
 
 	glewExperimental = GL_TRUE;

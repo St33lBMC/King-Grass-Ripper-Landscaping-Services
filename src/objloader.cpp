@@ -33,9 +33,7 @@ bool loadOBJ(
 
 	FILE* file = fopen(path, "r");
 	if (file == NULL) {
-		printf(
-			"Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n"
-		);
+		printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
 		getchar();
 		return false;
 	}
@@ -80,9 +78,7 @@ bool loadOBJ(
 				&normalIndex[2]
 			);
 			if (matches != 9) {
-				printf(
-					"File can't be read by our simple parser :-( Try exporting with other options\n"
-				);
+				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
 				fclose(file);
 				return false;
 			}

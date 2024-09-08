@@ -7,8 +7,8 @@ namespace utils {
 
 	class Camera {
 		public:
-            float m_fov = 35.0f;
-            float m_aspect = 1.0;
+			float m_fov = 35.0f;
+			float m_aspect = 1.0;
 			float m_pitch = 0.0;
 			float m_yaw = 0.0;
 			glm::vec3 m_position;
@@ -27,7 +27,7 @@ namespace utils {
 			/// the POV of this camera.
 			glm::vec3 up();
 
-            /// The view matrix of this camera.
+			/// The view matrix of this camera.
 			glm::mat4 view();
 
 			/// The perspective matrix of this camera.
