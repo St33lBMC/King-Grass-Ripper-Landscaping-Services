@@ -20,7 +20,7 @@ std::vector<glm::vec3> normals;
 void createModel()
 {
 	
-    bool res = loadOBJ("../src/cube.obj", vertices, uvs, normals);
+    bool res = loadOBJ("../src/cat.obj", vertices, uvs, normals);
 	std::cout << "balls and cock " << vertices.size() << std::endl;
 	for(auto vertex : vertices) {
 		std::cout << glm::to_string(vertex) << std::endl;
@@ -52,5 +52,5 @@ void createModel()
 
 void drawModel() {
 	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices));
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }

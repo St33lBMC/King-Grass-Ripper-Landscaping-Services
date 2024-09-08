@@ -1,6 +1,7 @@
 #include "utils/Camera.h"
 
 #include <glm/ext.hpp>
+#include <iostream>
 
 namespace utils {
 	glm::vec3 Camera::forward() {
