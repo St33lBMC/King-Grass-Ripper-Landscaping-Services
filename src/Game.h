@@ -3,7 +3,6 @@
 #include <glm/fwd.hpp>
 #include <memory>
 
-
 #include "gl_wrapper/shader/Shader.h"
 #include "graphics/Model.h"
 #include "models/ObjectModel.h"
@@ -13,6 +12,7 @@
 
 using namespace utils;
 using namespace gl_wrapper::shader;
+
 class Game {
 		Camera m_camera;
 		Program m_shader_program;

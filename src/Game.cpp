@@ -1,4 +1,5 @@
 #include "Game.h"
+
 #include <fstream>
 
 #include "graphics/Model.h"
@@ -24,26 +25,21 @@ void Game::loop(std::vector<graphics::Model> models) {
 	while (m_window.key_state(GLFW_KEY_ESCAPE) != KeyState::Pressed && !m_window.should_close());
 }
 
-
-std::string get_file_contents(const char *filename)
-{
-  std::ifstream in(filename, std::ios::in | std::ios::binary);
-  if (in)
-  {
-    std::string contents;
-    in.seekg(0, std::ios::end);
-    contents.resize(in.tellg());
-    in.seekg(0, std::ios::beg);
-    in.read(&contents[0], contents.size());
-    in.close();
-    return(contents);
-  }
-  throw(errno);
+std::string get_file_contents(const char* filename) {
+	std::ifstream in(filename, std::ios::in | std::ios::binary);
+	if (in) {
+		std::string contents;
+		in.seekg(0, std::ios::end);
+		contents.resize(in.tellg());
+		in.seekg(0, std::ios::beg);
+		in.read(&contents[0], contents.size());
+		in.close();
+		return (contents);
+	}
+	throw(errno);
 }
 
-Game::Game(Window&& window) :
-	m_camera(glm::vec3(0, 0, 0)),
-	m_window(std::move(window)) {
+Game::Game(Window&& window) : m_camera(glm::vec3(0, 0, 0)), m_window(std::move(window)) {
 	auto vertex_shader = Shader(ShaderType::Vertex);
 	auto fragment_shader = Shader(ShaderType::Fragment);
 

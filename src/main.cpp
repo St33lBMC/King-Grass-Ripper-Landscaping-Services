@@ -28,12 +28,13 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
 #include "utils/Camera.h"
-
+#include "utils/json/Parser.h"
 
 using namespace gl_wrapper;
 using namespace utils;
@@ -105,6 +106,13 @@ GLFWwindow* initialize() {
 };
 
 int main(void) {
+	// auto stream = std::istringstream("[true, false, true]");
+	// json::Tokenized tokenized(stream);
+
+	// for (auto i : tokenized.m_tokens)
+	// 	std::cout << std::to_underlying(i.m_token_type) << ' ';
+	// std::cout << std::endl;
+
 	GLFWwindow* window = initialize();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 

@@ -20,6 +20,7 @@ add_executable(kinggrassripper
     src/utils/Camera.cpp
     src/utils/Movement.cpp
     src/utils/Window.cpp
+    src/utils/json/Parser.cpp
     src/Game.cpp
     src/graphics/Model.cpp
     src/models/ObjectModel.cpp
