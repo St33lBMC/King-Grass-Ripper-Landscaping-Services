@@ -14,9 +14,6 @@
 
 //borrowed shader/obj parsing
 #include "Game.h"
-#include "assets/manager/AssetManager.h"
-#include "assets/provider/FileAssetProvider.h"
-#include "assets/types/TextAsset.h"
 #include "graphics/Model.h"
 #include "models/ObjectModel.h"
 #include "objloader.h"
@@ -37,7 +34,6 @@
 #include "gl_wrapper/shader/UniformImpl.h"
 #include "utils/Camera.h"
 
-using assets::provider::FileAssetProvider;
 
 using namespace gl_wrapper;
 using namespace utils;
@@ -111,9 +107,8 @@ GLFWwindow* initialize() {
 int main(void) {
 	GLFWwindow* window = initialize();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	std::unique_ptr<FileAssetProvider> asset_provider = std::make_unique<FileAssetProvider>("../src/");
 
-	Game game(Window(window), std::move(asset_provider));
+	Game game((Window(window)));
 	models::ObjectModel cube_obj("../src/cube.obj");
 	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1)));
 	cube_obj.upload_to(cube);

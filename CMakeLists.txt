@@ -18,8 +18,6 @@ add_executable(kinggrassripper
     src/gl_wrapper/shader/Shader.cpp
     src/objloader.cpp
     src/utils/Camera.cpp
-    src/assets/manager/AssetManager.cpp
-    src/assets/provider/FileAssetProvider.cpp
     src/utils/Movement.cpp
     src/utils/Window.cpp
     src/Game.cpp

@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <fstream>
 
 #include "graphics/Model.h"
 #include "models/ObjectModel.h"
@@ -15,25 +16,6 @@ void Game::loop(std::vector<graphics::Model> models) {
 			model.draw(m_shader_program);
 		}
 
-		// // Draw model(s)
-		// m_shader_program.set_uniform(
-		// 	"model_matrix",
-		// 	glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0))
-		// );
-		// models.at(0).draw();
-
-		// m_shader_program.set_uniform(
-		// 	"model_matrix",
-		// 	glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0))
-		// );
-		// models.at(1).draw();
-
-		/* //todo: loop through each model, set its position matrix and other uniforms, then draw it
-		for(auto model : models) {
-			model->drawModel();
-		}*/
-		//drawModel();
-
 		// Swap buffers
 		m_window.swap_buffers();
 		glfwPollEvents();
@@ -42,22 +24,34 @@ void Game::loop(std::vector<graphics::Model> models) {
 	while (m_window.key_state(GLFW_KEY_ESCAPE) != KeyState::Pressed && !m_window.should_close());
 }
 
-Game::Game(Window&& window, std::unique_ptr<AssetProvider> asset_provider) :
+
+std::string get_file_contents(const char *filename)
+{
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (in)
+  {
+    std::string contents;
+    in.seekg(0, std::ios::end);
+    contents.resize(in.tellg());
+    in.seekg(0, std::ios::beg);
+    in.read(&contents[0], contents.size());
+    in.close();
+    return(contents);
+  }
+  throw(errno);
+}
+
+Game::Game(Window&& window) :
 	m_camera(glm::vec3(0, 0, 0)),
-	m_window(std::move(window)),
-	m_asset_manager(std::move(asset_provider)) {
+	m_window(std::move(window)) {
 	auto vertex_shader = Shader(ShaderType::Vertex);
 	auto fragment_shader = Shader(ShaderType::Fragment);
 
-	auto vs = m_asset_manager.get_asset<types::TextAsset>("shaders/shader.vs");
-
-	vertex_shader.upload_shader_source(vs->text());
+	vertex_shader.upload_shader_source(get_file_contents("../src/shaders/shader.vs"));
 
 	vertex_shader.compile_shader();
 
-	auto fs = m_asset_manager.get_asset<types::TextAsset>("shaders/shader.fs");
-
-	fragment_shader.upload_shader_source(fs->text());
+	fragment_shader.upload_shader_source(get_file_contents("../src/shaders/shader.fs"));
 
 	fragment_shader.compile_shader();
 
