@@ -1,6 +1,5 @@
 #pragma once
 #include <GL/glew.h>
-#include <GL/glext.h>
 
 #include <cstdint>
 #include <exception>
