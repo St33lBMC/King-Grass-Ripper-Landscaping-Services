@@ -65,13 +65,13 @@ namespace utils::json {
 
 	class TokenizerException: public std::exception {
 		private:
-			std::string m_location;
+			std::string m_information;
 
 		public:
-			TokenizerException(size_t location) : m_location(std::to_string(location)) {}
+			TokenizerException(std::string info, size_t location) : m_information(info + " " + std::to_string(location)) {}
 
 			const char* what() const noexcept override {
-				return m_location.c_str();
+				return m_information.c_str();
 			}
 	};
 
