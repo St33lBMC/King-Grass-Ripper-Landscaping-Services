@@ -119,6 +119,7 @@ int main(void) {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	Game game((Window(window)));
+	game.camera().m_aspect = 1024.f / 768.f;
 	models::ObjectModel cube_obj("../src/cube.obj");
 	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1)));
 	cube_obj.upload_to(cube);
