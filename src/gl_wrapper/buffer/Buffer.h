@@ -5,6 +5,8 @@
 #include <span>
 #include <utility>
 
+#include "gl_wrapper/Utils.h"
+
 namespace gl_wrapper::buffer {
 
 	enum class BufferBindingTarget : GLenum { ArrayBuffer = GL_ARRAY_BUFFER, IndexBuffer = GL_ELEMENT_ARRAY_BUFFER };
@@ -13,29 +15,15 @@ namespace gl_wrapper::buffer {
 
 	enum class BufferIV : GLenum { BufferSize = GL_BUFFER_SIZE, BufferUsage = GL_BUFFER_USAGE };
 
-	class Buffer {
-			GLuint m_raw_id;
-			bool m_moved_from = false;
+	using BufferDestructor = decltype(GL_DEST(id) { return glDeleteBuffers(1, &id); });
+	using BufferConstructor = decltype([]() -> GLuint {
+		GLuint buffer;
+		glGenBuffers(1, &buffer);
+		return buffer;
+	});
 
+	class Buffer: public GLObject<Buffer, BufferConstructor, BufferDestructor> {
 		public:
-			Buffer() {
-				glGenBuffers(1, &m_raw_id);
-			}
-
-			~Buffer() {
-				if (!m_moved_from)
-					glDeleteBuffers(1, &m_raw_id);
-			}
-
-			Buffer(Buffer&& other) {
-				this->m_raw_id = other.m_raw_id;
-				other.m_moved_from = true;
-			}
-
-			GLuint raw_id() {
-				return m_raw_id;
-			}
-
 			void bind(BufferBindingTarget target) {
 				glBindBuffer((GLenum)target, m_raw_id);
 			}
