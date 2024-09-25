@@ -22,6 +22,10 @@ class Game {
 	public:
 		Game(Window&& window);
 
+		Camera& camera() {
+			return m_camera;
+		}
+
 		/// Runs the game loop.
 		void loop(std::vector<graphics::Model>);
 };
