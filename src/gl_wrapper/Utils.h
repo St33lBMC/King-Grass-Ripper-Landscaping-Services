@@ -4,8 +4,9 @@
 namespace gl_wrapper {
 
 	template<typename T, typename Constructor, typename Destructor, class... ConstructorArgs> class GLObject {
-		protected:
+		private:
 			bool m_moved_from = false;
+		protected:
 			GLuint m_raw_id;
 
 			GLObject(ConstructorArgs... args) {
