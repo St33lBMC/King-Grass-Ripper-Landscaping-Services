@@ -68,7 +68,8 @@ namespace utils::json {
 			std::string m_information;
 
 		public:
-			TokenizerException(std::string info, size_t location) : m_information(info + " " + std::to_string(location)) {}
+			TokenizerException(std::string info, size_t location) :
+				m_information(info + " " + std::to_string(location)) {}
 
 			const char* what() const noexcept override {
 				return m_information.c_str();
