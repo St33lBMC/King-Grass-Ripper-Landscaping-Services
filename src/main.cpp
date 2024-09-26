@@ -106,13 +106,13 @@ GLFWwindow* initialize() {
 };
 
 int main(void) {
-	auto stream = std::istringstream("[true, 1, \"abc\"]");
+	auto stream = std::istringstream("4");
 	json::Tokenized tokenized(stream);
+	std::cout << "RATHER: " << tokenized.peek().m_token_value.number << std::endl;
 
-	for (auto i : tokenized.m_tokens)
-		std::cout << std::to_underlying(i.m_token_type) << ' ';
+	std::cout << "got: ";
+	json::JSONValue::parse(tokenized)->display(std::cout);
 	std::cout << std::endl;
-
 	GLFWwindow* window = initialize();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 

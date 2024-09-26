@@ -85,7 +85,7 @@ namespace utils::json {
 						continue;
 					} else if (std::isdigit(peek)) {
 						stream.get();
-						std::string build = std::to_string(peek);
+						std::string build = std::string(1, peek);
 						bool dotted = false;
 						while (!stream.eof() && stream.peek() != EOF) {
 							char peek2 = stream.peek();
@@ -105,6 +105,18 @@ namespace utils::json {
 						throw TokenizerException("unknown character", stream.tellg());
 					}
 					break;
+			}
+		}
+	}
+
+	std::unique_ptr<JSONValue> JSONValue::parse(Tokenized& tokens) {
+		switch (tokens.peek().m_token_type) {
+			case TokenType::Boolean:
+			case TokenType::Null:
+			case TokenType::Number: {
+				auto val = std::make_unique<JSONPrimitive>();
+				val->parse_from(tokens);
+				return val;
 			}
 		}
 	}
