@@ -9,6 +9,8 @@
 #include <utility>
 #include <vector>
 
+#include "gl_wrapper/Utils.h"
+
 namespace gl_wrapper::uniforms {
 
 	template<typename T> void upload_uniform(T& value, GLint v);
@@ -46,29 +48,13 @@ namespace gl_wrapper::shader {
 			}
 	};
 
+	using ShaderDestructor = decltype(GL_DEST(id) { return glDeleteShader(id); });
+	using ShaderConstructor = decltype([](GLenum ty) -> GLuint { return glCreateShader(ty); });
+
 	/// Represents an OpenGL shader instance.
-	class Shader {
-			GLuint m_raw_id;
-			bool m_moved_from = false;
-
+	class Shader: public GLObject<Shader, ShaderConstructor, ShaderDestructor, GLenum> {
 		public:
-			Shader(ShaderType type) {
-				m_raw_id = glCreateShader(std::to_underlying(type));
-			}
-
-			~Shader() {
-				if (!m_moved_from)
-					glDeleteShader(m_raw_id);
-			}
-
-			Shader(Shader&& other) {
-				other.m_moved_from = true;
-				this->m_raw_id = other.m_raw_id;
-			}
-
-			GLuint raw_id() {
-				return m_raw_id;
-			}
+			Shader(ShaderType type) : GLObject(std::to_underlying(type)) {}
 
 			/// Compiles this shader.
 			/// Throws `ShaderCompileException` in the event of failure.
@@ -106,29 +92,11 @@ namespace gl_wrapper::shader {
 			void link();
 	};
 
-	class Program {
-			GLuint m_raw_id;
-			bool m_moved_from;
+	using ProgramDestructor = decltype(GL_DEST(id) { return glDeleteProgram(id); });
+	using ProgramConstructor = decltype([]() -> GLuint { return glCreateProgram(); });
 
+	class Program: public GLObject<Program, ProgramConstructor, ProgramDestructor> {
 		public:
-			Program() {
-				m_raw_id = glCreateProgram();
-			}
-
-			~Program() {
-				if (!m_moved_from)
-					glDeleteProgram(m_raw_id);
-			}
-
-			Program(Program&& other) {
-				this->m_raw_id = other.m_raw_id;
-				other.m_moved_from = true;
-			}
-
-			GLuint raw_id() {
-				return m_raw_id;
-			}
-
 			void use_program() {
 				glUseProgram(m_raw_id);
 			}

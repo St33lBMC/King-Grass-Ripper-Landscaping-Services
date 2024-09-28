@@ -25,6 +25,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <memory>
@@ -39,7 +40,7 @@
 using namespace gl_wrapper;
 using namespace utils;
 
-void print_glerror(
+extern "C" void print_glerror(
 	GLenum source,
 	GLenum type,
 	GLuint id,
@@ -96,9 +97,9 @@ GLFWwindow* initialize() {
 
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
-
-	glDebugMessageCallback(print_glerror, nullptr);
-
+	std::cout << "AB2C" << std::endl;
+	// glDebugMessageCallback(print_glerror, "abc");
+	std::cout << "IN2NIT" << std::endl;
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
@@ -114,9 +115,11 @@ int main(void) {
 	json::JSONValue::parse(tokenized)->display(std::cout);
 	std::cout << std::endl;
 	GLFWwindow* window = initialize();
+
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	Game game((Window(window)));
+	game.camera().m_aspect = 1024.f / 768.f;
 	models::ObjectModel cube_obj("../src/cube.obj");
 	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1)));
 	cube_obj.upload_to(cube);
