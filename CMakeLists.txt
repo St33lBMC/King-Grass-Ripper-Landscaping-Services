@@ -10,6 +10,7 @@ find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
+find_package(PNG REQUIRED)
 
 include_directories("src/")
 
@@ -26,4 +27,4 @@ add_executable(kinggrassripper
     src/models/ObjectModel.cpp
 )
 
-target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew)
+target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew png)
