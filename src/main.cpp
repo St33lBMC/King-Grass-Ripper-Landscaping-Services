@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <concepts>
 #include <cstdlib>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/scalar_common.hpp>
@@ -18,12 +19,12 @@
 #include "models/ObjectModel.h"
 #include "objloader.h"
 
-//arbitrary model class
-// #include "objmodel.h"
-
 // Include glew, GLFW, glm
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+//image file parser for textures
+#include <png.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>
@@ -39,6 +40,20 @@
 
 using namespace gl_wrapper;
 using namespace utils;
+
+
+
+//libpng testing
+void read_texture(char* fname) {
+	FILE *test = fopen(fname, "r");
+	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	png_init_io(png, test);
+	auto info = png_create_info_struct(png);
+	if(!info) std::cout << "unable to generate png info" << std::endl;
+	png_set_sig_bytes(png, 0);
+	png_read_info(png, info);
+	png_read_png(png, info, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, nullptr);
+}
 
 extern "C" void print_glerror(
 	GLenum source,
@@ -107,6 +122,8 @@ GLFWwindow* initialize() {
 };
 
 int main(void) {
+	read_texture("/home/steel/cooding/openGL/king/src/oak_planks.png");
+
 	auto stream = std::istringstream("[true, 1, \"abc\"]");
 	json::Tokenized tokenized(stream);
 
