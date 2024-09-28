@@ -51,7 +51,6 @@ void read_texture(char* fname) {
 	auto info = png_create_info_struct(png);
 	if(!info) std::cout << "unable to generate png info" << std::endl;
 	png_set_sig_bytes(png, 0);
-	png_read_info(png, info);
 	png_read_png(png, info, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, nullptr);
 }
 
@@ -122,15 +121,15 @@ GLFWwindow* initialize() {
 };
 
 int main(void) {
-	read_texture("/home/steel/cooding/openGL/king/src/oak_planks.png");
+	read_texture("");
 
 	auto stream = std::istringstream("[true, 1, \"abc\"]");
-	json::Tokenized tokenized(stream);
-	std::cout << "RATHER: " << tokenized.peek().m_token_value.number << std::endl;
+	// json::Tokenized tokenized(stream);
+	// std::cout << "RATHER: " << tokenized.peek().m_token_value.number << std::endl;
 
-	std::cout << "got: ";
-	json::JSONValue::parse(tokenized)->display(std::cout);
-	std::cout << std::endl;
+	// std::cout << "got: ";
+	// json::JSONValue::parse(tokenized)->display(std::cout);
+	// std::cout << std::endl;
 	GLFWwindow* window = initialize();
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
