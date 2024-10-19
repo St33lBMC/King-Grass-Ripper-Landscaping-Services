@@ -127,9 +127,7 @@ namespace utils::json {
 	};
 
 	struct JSONArray: public JSONValue {
-		std::vector<std::unique_ptr<JSONValue>> m_values;
-	
-		
+			std::vector<std::unique_ptr<JSONValue>> m_values;
 	};
 
 	struct JSONPrimitive: public JSONValue {

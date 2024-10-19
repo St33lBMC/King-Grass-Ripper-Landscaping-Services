@@ -1,6 +1,9 @@
 #include "graphics/image/Image.h"
+
 #include <png.h>
+
 #include "utils/Verify.h"
+
 namespace graphics {
 
 	RGBA8888Image RGBA8888Image::from_file(std::filesystem::path path) {
@@ -13,9 +16,9 @@ namespace graphics {
 			image.format = PNG_FORMAT_RGBA;
 			buffer = new uint8_t[PNG_IMAGE_SIZE(image)];
 			if (buffer != NULL && png_image_finish_read(&image, nullptr, buffer, 0 /*row_stride*/, nullptr) != 0) {
-                // FIXME: alignment OK here or not?
-                auto i = RGBA8888Image(image.width, image.height, reinterpret_cast<uint32_t*>(buffer));
-                return i;
+				// FIXME: alignment OK here or not?
+				auto i = RGBA8888Image(image.width, image.height, reinterpret_cast<uint32_t*>(buffer));
+				return i;
 			}
 		}
 		VERIFY_NOT_REACHED();

@@ -14,7 +14,9 @@ namespace graphics {
 			glm::vec4 m_colour;
 			std::shared_ptr<Texture2D> m_texture;
 
-			explicit Material(glm::vec4 colour, std::shared_ptr<Texture2D> texture) : m_colour(colour), m_texture(texture) {}
+			explicit Material(glm::vec4 colour, std::shared_ptr<Texture2D> texture) :
+				m_colour(colour),
+				m_texture(texture) {}
 
 			void upload_uniform(gl_wrapper::shader::Program& program, std::string base) {
 				program.set_uniform(base + ".colour", m_colour);

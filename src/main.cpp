@@ -1,4 +1,6 @@
 // Include standard headers
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +16,6 @@
 #include <glm/matrix.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
-#include <fmt/format.h>
 
 //borrowed shader/obj parsing
 #include "Game.h"
@@ -59,7 +60,6 @@ using namespace utils;
 // 	png_read_png(png, info, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, nullptr);
 // }
 
-
 extern "C" void print_glerror(
 	GLenum source,
 	GLenum type,
@@ -69,7 +69,7 @@ extern "C" void print_glerror(
 	const GLchar* message,
 	const void* userParam
 ) {
-	std::cout << message << std::endl;
+	fmt::print("OpenGL error: {}", message);
 }
 
 GLFWwindow* initialize() {
@@ -110,9 +110,7 @@ GLFWwindow* initialize() {
 
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
-	std::cout << "AB2C" << std::endl;
 	// glDebugMessageCallback(print_glerror, "abc");
-	std::cout << "IN2NIT" << std::endl;
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
@@ -120,16 +118,6 @@ GLFWwindow* initialize() {
 };
 
 int main(void) {
-	//read_texture("");
-
-
-	auto stream = std::istringstream("[true, 1, \"abc\"]");
-	// json::Tokenized tokenized(stream);
-	// std::cout << "RATHER: " << tokenized.peek().m_token_value.number << std::endl;
-
-	// std::cout << "got: ";
-	// json::JSONValue::parse(tokenized)->display(std::cout);
-	// std::cout << std::endl;
 	GLFWwindow* window = initialize();
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

@@ -23,7 +23,10 @@ namespace graphics {
 				std::memcpy(m_data.get(), data.data(), data.size_bytes());
 			}
 
-            RGBA8888Image(size_t width, size_t height, uint32_t* data): m_width(width), m_height(height), m_data(data) {}
+			RGBA8888Image(size_t width, size_t height, uint32_t* data) :
+				m_width(width),
+				m_height(height),
+				m_data(data) {}
 
 		public:
 			size_t width() {

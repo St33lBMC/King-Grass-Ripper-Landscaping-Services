@@ -27,21 +27,20 @@ namespace gl_wrapper {
 			void bind_texture(TextureBindTarget target) {
 				glBindTexture(std::to_underlying(target), m_raw_id);
 			}
+
 		public:
 			static void set_active_texture(GLenum texture) {
 				glActiveTexture(texture);
 			}
 	};
 
-	class Texture2D : public Texture {
+	class Texture2D: public Texture {
 		public:
 			void bind_texture() {
 				Texture::bind_texture(TextureBindTarget::Texture2D);
-			}	
+			}
 
-			void upload_image(
-				graphics::RGBA8888Image& image
-			) {
+			void upload_image(graphics::RGBA8888Image& image) {
 				bind_texture();
 				glTexImage2D(
 					std::to_underlying(TextureBindTarget::Texture2D),

@@ -69,7 +69,6 @@ namespace gl_wrapper::shader {
 			case GL_TRUE:
 				return;
 			default:
-				std::cout << "GOT: " << v << std::endl;
 				throw ShaderException(m_program->info_log());
 		}
 	}
@@ -79,13 +78,11 @@ namespace gl_wrapper::shader {
 	}
 
 	void Linking::attach_shader(Shader& shader) {
-		std::cout << "Attaching " << shader.raw_id() << " to " << m_program->raw_id() << std::endl;
 		glAttachShader(m_program->raw_id(), shader.raw_id());
 		m_attached_shaders.push_back(shader.raw_id());
 	}
 
 	Linking::~Linking() {
-		std::cout << "Destructor of l" << std::endl;
 		for (auto shader : m_attached_shaders) {
 			glDetachShader(m_program->raw_id(), shader);
 		}
