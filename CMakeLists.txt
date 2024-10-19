@@ -24,6 +24,7 @@ add_executable(kinggrassripper
     src/utils/json/Parser.cpp
     src/Game.cpp
     src/graphics/Model.cpp
+    src/graphics/image/Image.cpp
     src/models/ObjectModel.cpp
 )
 

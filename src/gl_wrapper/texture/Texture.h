@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "gl_wrapper/Utils.h"
+#include "graphics/image/Image.h"
 
 namespace gl_wrapper {
 
@@ -39,23 +40,19 @@ namespace gl_wrapper {
 			}	
 
 			void upload_image(
-				size_t width,
-				size_t height,
-				ImageFormat2D src_format,
-				ImageFormat2D internal_format,
-				std::span<uint8_t> data
+				graphics::RGBA8888Image& image
 			) {
 				bind_texture();
 				glTexImage2D(
 					std::to_underlying(TextureBindTarget::Texture2D),
 					0,
-					std::to_underlying(internal_format),
-					width,
-					height,
+					std::to_underlying(ImageFormat2D::RGBA),
+					image.width(),
+					image.height(),
 					0,
-					std::to_underlying(src_format),
+					std::to_underlying(ImageFormat2D::RGBA),
 					GL_UNSIGNED_BYTE,
-					data.data()
+					image.data().data()
 				);
 				// FIXME: shouldn't really be defaulted here
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

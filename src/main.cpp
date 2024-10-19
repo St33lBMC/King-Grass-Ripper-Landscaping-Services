@@ -19,6 +19,7 @@
 #include "Game.h"
 #include "gl_wrapper/texture/Texture.h"
 #include "graphics/Model.h"
+#include "graphics/image/Image.h"
 #include "models/ObjectModel.h"
 #include "objloader.h"
 
@@ -56,22 +57,6 @@ using namespace utils;
 // 	png_read_png(png, info, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, nullptr);
 // }
 
-uint8_t* read_png_simple(char* fname) {
-	png_image image;
-	memset(&image, 0, sizeof(image));
-	image.version = PNG_IMAGE_VERSION;
-
-	if (png_image_begin_read_from_file(&image, fname) != 0) {
-		png_bytep buffer;
-		image.format = PNG_FORMAT_RGBA;
-		buffer = new uint8_t[PNG_IMAGE_SIZE(image)];
-		if (buffer != NULL
-			&& png_image_finish_read(&image, nullptr, buffer, 0 /*row_stride*/, nullptr) != 0) {
-				return buffer;
-		}
-	}
-	return nullptr;
-}
 
 extern "C" void print_glerror(
 	GLenum source,
@@ -153,10 +138,10 @@ int main(void) {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	uint8_t* data = read_png_simple("");
+	auto img = graphics::RGBA8888Image::from_file("/home/exo/Documents/oak_planks.png");
 
 	auto tex = std::make_shared<Texture2D>();
-	tex->upload_image(16, 16, ImageFormat2D::RGBA, ImageFormat2D::RGB, std::span(data, 256));
+	tex->upload_image(img);
 
 	Game game((Window(window)));
 	game.camera().m_aspect = 1024.f / 768.f;
