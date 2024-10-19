@@ -22,6 +22,7 @@
 #include "graphics/image/Image.h"
 #include "models/ObjectModel.h"
 #include "objloader.h"
+#include "utils/Verify.h"
 
 // Include glew, GLFW, glm
 #include <GL/glew.h>
