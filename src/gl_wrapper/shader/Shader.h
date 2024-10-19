@@ -22,6 +22,10 @@ namespace gl_wrapper::uniforms {
 	template<> inline void upload_uniform<glm::vec4>(glm::vec4& value, GLint v) {
 		glUniform4fv(v, 1, &value[0]);
 	};
+
+	template<> inline void upload_uniform<int32_t>(int32_t& value, GLint v) {
+		glUniform1i(v, value);
+	}
 } // namespace gl_wrapper::uniforms
 
 namespace gl_wrapper::shader {

@@ -8,9 +8,14 @@ struct Material {
     vec4 colour;
 };
 
+in vec2 UV;
+
 uniform Material material;
+
+uniform sampler2D textureSampler;
+
 
 out vec4 color;
 void main(){
-    color = material.colour; //texture( myTextureSampler, UV ).rgb;
+    color = texture( textureSampler, UV * 8 ).rgba;
 }

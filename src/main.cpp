@@ -4,7 +4,9 @@
 #include <stdlib.h>
 
 #include <concepts>
+#include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/scalar_common.hpp>
 #include <glm/ext/scalar_constants.hpp>
@@ -15,6 +17,7 @@
 
 //borrowed shader/obj parsing
 #include "Game.h"
+#include "gl_wrapper/texture/Texture.h"
 #include "graphics/Model.h"
 #include "models/ObjectModel.h"
 #include "objloader.h"
@@ -41,17 +44,33 @@
 using namespace gl_wrapper;
 using namespace utils;
 
-
-
 //libpng testing
-void read_texture(char* fname) {
-	FILE *test = fopen(fname, "r");
-	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-	png_init_io(png, test);
-	auto info = png_create_info_struct(png);
-	if(!info) std::cout << "unable to generate png info" << std::endl;
-	png_set_sig_bytes(png, 0);
-	png_read_png(png, info, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, nullptr);
+// void read_texture(char* fname) {
+// 	FILE* test = fopen(fname, "r");
+// 	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+// 	png_init_io(png, test);
+// 	auto info = png_create_info_struct(png);
+// 	if (!info)
+// 		std::cout << "unable to generate png info" << std::endl;
+// 	png_set_sig_bytes(png, 0);
+// 	png_read_png(png, info, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, nullptr);
+// }
+
+uint8_t* read_png_simple(char* fname) {
+	png_image image;
+	memset(&image, 0, sizeof(image));
+	image.version = PNG_IMAGE_VERSION;
+
+	if (png_image_begin_read_from_file(&image, fname) != 0) {
+		png_bytep buffer;
+		image.format = PNG_FORMAT_RGBA;
+		buffer = new uint8_t[PNG_IMAGE_SIZE(image)];
+		if (buffer != NULL
+			&& png_image_finish_read(&image, nullptr, buffer, 0 /*row_stride*/, nullptr) != 0) {
+				return buffer;
+		}
+	}
+	return nullptr;
 }
 
 extern "C" void print_glerror(
@@ -121,7 +140,7 @@ GLFWwindow* initialize() {
 };
 
 int main(void) {
-	read_texture("");
+	//read_texture("");
 
 	auto stream = std::istringstream("[true, 1, \"abc\"]");
 	// json::Tokenized tokenized(stream);
@@ -134,15 +153,20 @@ int main(void) {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	uint8_t* data = read_png_simple("");
+
+	auto tex = std::make_shared<Texture2D>();
+	tex->upload_image(16, 16, ImageFormat2D::RGBA, ImageFormat2D::RGB, std::span(data, 256));
+
 	Game game((Window(window)));
 	game.camera().m_aspect = 1024.f / 768.f;
 	models::ObjectModel cube_obj("../src/cube.obj");
-	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1)));
+	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1), tex));
 	cube_obj.upload_to(cube);
 	cube.transform() = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0));
 
 	models::ObjectModel book_obj("../src/book.obj");
-	graphics::Model book(graphics::Material(glm::vec4(1, 0, 0, 1)));
+	graphics::Model book(graphics::Material(glm::vec4(1, 0, 0, 1), tex));
 	book_obj.upload_to(book);
 	book.transform() = glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0));
 
