@@ -14,6 +14,7 @@
 #include <glm/matrix.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
+#include <fmt/format.h>
 
 //borrowed shader/obj parsing
 #include "Game.h"
