@@ -75,9 +75,7 @@ extern "C" void print_glerror(
 GLFWwindow* initialize() {
 	// Initialize GLFW
 	if (!glfwInit()) {
-		fprintf(stderr, "Failed to initialize GLFW\n");
-		getchar();
-		exit(-1);
+		PANIC("failed to initialise GLFW");
 	}
 
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -93,13 +91,8 @@ GLFWwindow* initialize() {
 	// Open a window and create its OpenGL context
 	GLFWwindow* window = glfwCreateWindow(1024, 768, "balls 01", NULL, NULL);
 	if (window == NULL) {
-		fprintf(
-			stderr,
-			"Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n"
-		);
-		getchar();
 		glfwTerminate();
-		exit(-1);
+		PANIC("failed to open GLFW window");
 	}
 	glfwMakeContextCurrent(window);
 
@@ -128,6 +121,7 @@ GLFWwindow* initialize() {
 
 int main(void) {
 	//read_texture("");
+
 
 	auto stream = std::istringstream("[true, 1, \"abc\"]");
 	// json::Tokenized tokenized(stream);

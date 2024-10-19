@@ -36,7 +36,7 @@ std::string get_file_contents(const char* filename) {
 		in.close();
 		return (contents);
 	}
-	throw(errno);
+	PANIC("read of {} failed with {} as errno",filename, errno);
 }
 
 Game::Game(Window&& window) : m_camera(glm::vec3(0, 0, 0)), m_window(std::move(window)) {
