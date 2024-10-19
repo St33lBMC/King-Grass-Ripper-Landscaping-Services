@@ -24,6 +24,7 @@
 #include "graphics/image/Image.h"
 #include "models/ObjectModel.h"
 #include "objloader.h"
+#include "tracy/TracyOpenGL.hpp"
 #include "utils/Verify.h"
 
 // Include glew, GLFW, glm
@@ -113,6 +114,8 @@ GLFWwindow* initialize() {
 	// glDebugMessageCallback(print_glerror, "abc");
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+	TracyGpuContext;
 
 	return window;
 };

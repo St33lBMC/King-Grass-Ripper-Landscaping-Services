@@ -1,8 +1,12 @@
 #include "graphics/Model.h"
 
+#include "tracy/TracyOpenGL.hpp"
+
 namespace graphics {
 
 	Model::Model(Material material) : m_material(material) {
+		ZoneScoped;
+		TracyGpuZone("model upload");
 		m_vao.bind();
 
 		m_vertices.bind();

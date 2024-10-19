@@ -7,6 +7,7 @@
 #include "gl_wrapper/buffer/Buffer.h"
 #include "gl_wrapper/shader/Shader.h"
 #include "graphics/Material.h"
+#include "tracy/TracyOpenGL.hpp"
 
 using namespace gl_wrapper::buffer;
 using namespace gl_wrapper;
@@ -44,6 +45,8 @@ namespace graphics {
 			Model(Material material);
 
 			void draw(shader::Program& program) {
+				ZoneScoped;
+				TracyGpuZone("model draw");
 				program.set_uniform("model_matrix", transform());
 				m_material.upload_uniform(program, "material");
 				m_vao.bind();

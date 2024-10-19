@@ -4,9 +4,12 @@
 
 #include "graphics/Model.h"
 #include "models/ObjectModel.h"
+#include "tracy/Tracy.hpp"
+#include "tracy/TracyOpenGL.hpp"
 
 void Game::loop(std::vector<graphics::Model> models) {
 	do {
+		FrameMark;
 		m_movement.process_movement(m_window, m_camera);
 		m_shader_program.set_uniform("view_matrix", m_camera.view());
 
@@ -19,6 +22,7 @@ void Game::loop(std::vector<graphics::Model> models) {
 
 		// Swap buffers
 		m_window.swap_buffers();
+		TracyGpuCollect;
 		glfwPollEvents();
 
 	} // Check if the ESC key was pressed or the window was closed

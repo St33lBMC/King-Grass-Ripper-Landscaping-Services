@@ -14,6 +14,9 @@ find_package(PNG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 
 include_directories("src/")
+include_directories("src/tracy/")
+
+add_definitions(-DTRACY_ENABLE)
 
 add_executable(kinggrassripper
     src/main.cpp
@@ -27,6 +30,9 @@ add_executable(kinggrassripper
     src/graphics/Model.cpp
     src/graphics/image/Image.cpp
     src/models/ObjectModel.cpp
+
+
+    src/tracy/TracyClient.cpp
 )
 
 target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew png fmt::fmt-header-only)
