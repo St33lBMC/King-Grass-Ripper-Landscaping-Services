@@ -25,8 +25,9 @@ void Game::loop(std::vector<graphics::Model> models) {
 		TracyGpuCollect;
 		glfwPollEvents();
 
-	} // Check if the ESC key was pressed or the window was closed
-	while (m_window.key_state(GLFW_KEY_ESCAPE) != KeyState::Pressed && !m_window.should_close());
+	} // Check if the window was closed
+	  // escape key functionality changed to unlocking cursor
+	while (!m_window.should_close());
 }
 
 std::string get_file_contents(const char* filename) {

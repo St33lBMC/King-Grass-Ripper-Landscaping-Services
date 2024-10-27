@@ -18,6 +18,12 @@ namespace utils {
 
 			Window(Window&& w);
 
+			/// Returns a pointer to the raw window
+			/// if this breaks your encapsulation fix it bucko
+			GLFWwindow* get_raw_window() {
+				return m_raw_window;
+			}
+
 			/// Swaps the buffers. Corresponds to
 			/// `glfwSwapBuffers(window);`
 			void swap_buffers();
