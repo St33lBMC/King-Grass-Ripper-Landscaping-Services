@@ -50,7 +50,7 @@ namespace graphics {
 				program.set_uniform("model_matrix", transform());
 				m_material.upload_uniform(program, "material");
 				m_vao.bind();
-				glDrawArrays(GL_TRIANGLES, 0, m_vertices.size()+4);
+				glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
 			}
 	};
 } // namespace graphics

@@ -125,7 +125,7 @@ int main(void) {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	auto img = graphics::RGBA8888Image::from_file("/home/steel/cooding/openGL/king/metal.png");
+	auto img = graphics::RGBA8888Image::from_file("/home/exo/Documents/thebuild.png");
 
 	auto tex = std::make_shared<Texture2D>();
 	tex->upload_image(img);

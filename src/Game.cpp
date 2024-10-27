@@ -26,7 +26,7 @@ void Game::loop(std::vector<graphics::Model> models) {
 		glfwPollEvents();
 
 	} // Check if the window was closed
-	  // escape key functionality changed to unlocking cursor
+	// escape key functionality changed to unlocking cursor
 	while (!m_window.should_close());
 }
 

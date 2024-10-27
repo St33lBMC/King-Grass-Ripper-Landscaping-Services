@@ -4,7 +4,13 @@
 #include <glm/ext.hpp>
 
 namespace utils {
-	enum class KeyState : int { Pressed = GLFW_PRESS, Released = GLFW_RELEASE };
+	enum class ButtonState : int { Pressed = GLFW_PRESS, Released = GLFW_RELEASE };
+
+	enum class CursorMode : int {
+		Normal = GLFW_CURSOR_NORMAL,
+		Hidden = GLFW_CURSOR_HIDDEN,
+		Disabled = GLFW_CURSOR_DISABLED
+	};
 
 	class Window {
 			GLFWwindow* m_raw_window;
@@ -18,9 +24,7 @@ namespace utils {
 
 			Window(Window&& w);
 
-			/// Returns a pointer to the raw window
-			/// if this breaks your encapsulation fix it bucko
-			GLFWwindow* get_raw_window() {
+			GLFWwindow* raw_window() {
 				return m_raw_window;
 			}
 
@@ -30,7 +34,11 @@ namespace utils {
 
 			/// Gets the state of key `key`. Corresponds
 			/// to `glfwGetKey(window, key);`
-			KeyState key_state(int key);
+			ButtonState key_state(int key);
+
+			/// Gets the state of mouse button `button`.
+			/// Corresponds to `glfwGetMouseButton(window, button);`
+			ButtonState mouse_button_state(int button);
 
 			/// Checks if this window should close.
 			/// Corresponds to `glfwWindowShouldClose(window);`
@@ -39,5 +47,13 @@ namespace utils {
 			/// Gets the current cursor position.
 			/// Corresponds to `glfwGetCursorPos`.
 			glm::dvec2 cursor_position();
+
+			/// Sets the current cursor position.
+			/// Corresponds to `glfwSetCursorPos`.
+			void cursor_position(glm::dvec2&);
+
+			/// Sets the current cursor mode.
+			/// Corresponds to `glfwSetInputMode(window, GLFW_CURSOR, mode)`.
+			void set_cursor_mode(CursorMode);
 	};
 } // namespace utils
