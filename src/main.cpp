@@ -43,6 +43,7 @@
 
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
+#include "graphics/text/Freetype.h"
 #include "utils/Camera.h"
 #include "utils/json/Parser.h"
 
@@ -125,10 +126,40 @@ int main(void) {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	auto img = graphics::RGBA8888Image::from_file("/home/exo/Documents/thebuild.png");
+	using namespace graphics::text;
+
+	freetype::Library library;
+
+	freetype::FontFace face(library, "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 0);
+
+	face.set_char_size(16 * 64, 16 * 64, 300, 300);
+
+	face.load_glyph(face.char_index('O'), 0);
+	face.render_glyph();
 
 	auto tex = std::make_shared<Texture2D>();
-	tex->upload_image(img);
+	tex->bind_texture();
+	glTexImage2D(
+		std::to_underlying(TextureBindTarget::Texture2D),
+		0,
+		std::to_underlying(ImageFormat2D::Red),
+		face.raw()->glyph->bitmap.width,
+		face.raw()->glyph->bitmap.rows,
+		0,
+		std::to_underlying(ImageFormat2D::Red),
+		GL_UNSIGNED_BYTE,
+		face.raw()->glyph->bitmap.buffer
+	);
+	// FIXME: shouldn't really be defaulted here
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	fmt::print("Char index of a: {}\n", face.raw()->glyph->bitmap.pixel_mode);
+
+	// auto img = graphics::RGBA8888Image::from_file("/home/exo/Documents/thebuild.png");
+
+	// auto tex = std::make_shared<Texture2D>();
+	// tex->upload_image(img);
 
 	Game game((Window(window)));
 	game.camera().m_aspect = 1024.f / 768.f;

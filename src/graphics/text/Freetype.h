@@ -1,0 +1,92 @@
+#pragma once
+#include <freetype2/ft2build.h>
+
+#include <cstdint>
+#include <string_view>
+
+#include "utils/Verify.h"
+#include FT_FREETYPE_H
+#include FT_MODULE_H
+
+namespace graphics::text::freetype {
+
+	class Library {
+			FT_Library m_library;
+
+		public:
+			Library() {
+				auto error = FT_Init_FreeType(&m_library);
+				if (error) {
+					PANIC("freetype init failed: {}", FT_Error_String(error));
+				}
+			}
+
+			FT_Library raw() {
+				return m_library;
+			}
+
+			~Library() {
+				FT_Done_FreeType(m_library);
+			}
+	};
+
+	class FontFace {
+			Library& m_library;
+			FT_Face m_face;
+
+		public:
+			using CharIndex = uint32_t;
+
+			FontFace(Library& library, const char* file_path_name, long face_index) : m_library(library) {
+				auto error = FT_New_Face(library.raw(), file_path_name, face_index, &m_face);
+				if (error) {
+					PANIC("freetype font face creation failed: {}", FT_Error_String(error));
+				}
+			}
+
+			void set_char_size(
+				long char_width,
+				long char_height,
+				unsigned int horizontal_resolution,
+				unsigned int vertical_resolution
+			) {
+				auto error =
+					FT_Set_Char_Size(m_face, char_width, char_height, horizontal_resolution, vertical_resolution);
+				if (error) {
+					PANIC("freetype char size set failed: {}", FT_Error_String(error));
+				}
+			}
+
+			CharIndex char_index(unsigned long char_code) {
+				return FT_Get_Char_Index(m_face, char_code);
+			}
+
+			void load_glyph(CharIndex char_index, uint32_t load_flags) {
+				auto error = FT_Load_Glyph(m_face, char_index, load_flags);
+				if (error) {
+					PANIC("freetype glyph load failed: {}", FT_Error_String(error));
+				}
+			}
+
+			void render_glyph(FT_Render_Mode render_mode = FT_RENDER_MODE_NORMAL) {
+				auto error = FT_Render_Glyph(m_face->glyph, render_mode);
+				if (error) {
+					PANIC("freetype glyph render failed: {}", FT_Error_String(error));
+				}
+			}
+
+            FT_Face raw() {
+                return m_face;
+            }
+
+
+			FontFace(FontFace& other) : m_library(other.m_library), m_face(other.m_face) {
+				FT_Reference_Face(m_face);
+			}
+
+			~FontFace() {
+				FT_Done_Face(m_face);
+			}
+	};
+
+}; // namespace graphics::text::freetype

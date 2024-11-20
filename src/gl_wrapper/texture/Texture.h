@@ -20,7 +20,7 @@ namespace gl_wrapper {
 
 	enum class TextureBindTarget : GLenum { Texture2D = GL_TEXTURE_2D };
 
-	enum class ImageFormat2D : GLenum { RGB = GL_RGB, BGR = GL_BGR, RGBA = GL_RGBA };
+	enum class ImageFormat2D : GLenum { RGB = GL_RGB, BGR = GL_BGR, RGBA = GL_RGBA, Red = GL_RED };
 
 	class Texture: public GLObject<Texture, TextureConstructor, TextureDestructor> {
 		protected:

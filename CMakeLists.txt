@@ -12,6 +12,7 @@ find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 find_package(PNG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(Freetype MODULE REQUIRED)
 
 include_directories("src/")
 include_directories("src/tracy/")
@@ -35,4 +36,4 @@ add_executable(kinggrassripper
     src/tracy/TracyClient.cpp
 )
 
-target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew png fmt::fmt-header-only)
+target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew png fmt::fmt-header-only Freetype::Freetype)
