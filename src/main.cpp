@@ -130,36 +130,25 @@ int main(void) {
 
 	freetype::Library library;
 
-	freetype::FontFace face(library, "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 0);
+	freetype::FontFace face(library, "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc", 0);
 
-	face.set_char_size(16 * 64, 16 * 64, 300, 300);
+	face.set_char_size(0, 11 * 64, 0, 0);
+	face.set_pixel_size(300, 300);
 
-	face.load_glyph(face.char_index('O'), 0);
+	face.load_glyph(face.char_index('C'), 0);
 	face.render_glyph();
 
 	auto tex = std::make_shared<Texture2D>();
-	tex->bind_texture();
-	glTexImage2D(
-		std::to_underlying(TextureBindTarget::Texture2D),
-		0,
-		std::to_underlying(ImageFormat2D::Red),
-		face.raw()->glyph->bitmap.width,
-		face.raw()->glyph->bitmap.rows,
-		0,
-		std::to_underlying(ImageFormat2D::Red),
-		GL_UNSIGNED_BYTE,
-		face.raw()->glyph->bitmap.buffer
-	);
-	// FIXME: shouldn't really be defaulted here
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	tex->upload_image(face.bitmap());
 
 	fmt::print("Char index of a: {}\n", face.raw()->glyph->bitmap.pixel_mode);
 
-	// auto img = graphics::RGBA8888Image::from_file("/home/exo/Documents/thebuild.png");
+	// auto img = graphics::from_file("/home/exo/Documents/thebuild.png");
 
 	// auto tex = std::make_shared<Texture2D>();
-	// tex->upload_image(img);
+	// tex->upload_image(graphics::ImageRef<graphics::PixelFormat::RGBA8888> { img });
+
+
 
 	Game game((Window(window)));
 	game.camera().m_aspect = 1024.f / 768.f;

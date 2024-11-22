@@ -8,6 +8,7 @@
 
 #include "gl_wrapper/Utils.h"
 #include "graphics/image/Image.h"
+#include "utils/Verify.h"
 
 namespace gl_wrapper {
 
@@ -40,16 +41,35 @@ namespace gl_wrapper {
 				Texture::bind_texture(TextureBindTarget::Texture2D);
 			}
 
-			void upload_image(graphics::RGBA8888Image& image) {
+			template<graphics::PixelFormat T> void upload_image(graphics::ImageRef<T> image) {
 				bind_texture();
+				ImageFormat2D gl_image_format;
+
+				switch (T) {
+					case graphics::PixelFormat::RGBA8888:
+						gl_image_format = ImageFormat2D::RGBA;
+						break;
+					case graphics::PixelFormat::RGB888:
+						gl_image_format = ImageFormat2D::RGB;
+						break;
+					case graphics::PixelFormat::Grayscale8:
+						gl_image_format = ImageFormat2D::Red;
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+						break;
+					default:
+						PANIC("unreachable")
+				};
+
 				glTexImage2D(
 					std::to_underlying(TextureBindTarget::Texture2D),
 					0,
-					std::to_underlying(ImageFormat2D::RGBA),
+					std::to_underlying(gl_image_format),
 					image.width(),
 					image.height(),
 					0,
-					std::to_underlying(ImageFormat2D::RGBA),
+					std::to_underlying(gl_image_format),
 					GL_UNSIGNED_BYTE,
 					image.data().data()
 				);

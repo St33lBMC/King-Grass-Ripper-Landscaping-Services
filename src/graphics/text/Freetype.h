@@ -4,9 +4,11 @@
 #include <cstdint>
 #include <string_view>
 
+#include "graphics/image/Image.h"
 #include "utils/Verify.h"
 #include FT_FREETYPE_H
 #include FT_MODULE_H
+#include FT_BITMAP_H
 
 namespace graphics::text::freetype {
 
@@ -57,6 +59,13 @@ namespace graphics::text::freetype {
 				}
 			}
 
+			void set_pixel_size(unsigned int pixel_width, unsigned int pixel_height) {
+				auto error = FT_Set_Pixel_Sizes(m_face, pixel_width, pixel_height);
+				if (error) {
+					PANIC("freetype char pixel size set failed: {}", FT_Error_String(error));
+				}
+			}
+
 			CharIndex char_index(unsigned long char_code) {
 				return FT_Get_Char_Index(m_face, char_code);
 			}
@@ -75,10 +84,22 @@ namespace graphics::text::freetype {
 				}
 			}
 
-            FT_Face raw() {
-                return m_face;
-            }
+			graphics::ImageRef<PixelFormat::Grayscale8> bitmap() {
+				VERIFY(m_face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY, "Not grayscale font bitmap");
 
+
+				auto& bitmap = m_face->glyph->bitmap;
+				fmt::print("Width {} rows {} pitch {}\n", bitmap.width, bitmap.rows, bitmap.pitch);
+				return ImageRef<PixelFormat::Grayscale8>(
+					std::span(bitmap.buffer, bitmap.width * bitmap.rows),
+					bitmap.width,
+					bitmap.rows
+				);
+			}
+
+			FT_Face raw() {
+				return m_face;
+			}
 
 			FontFace(FontFace& other) : m_library(other.m_library), m_face(other.m_face) {
 				FT_Reference_Face(m_face);

@@ -6,7 +6,7 @@
 
 namespace graphics {
 
-	RGBA8888Image RGBA8888Image::from_file(std::filesystem::path path) {
+	Image<PixelFormat::RGBA8888> from_file(std::filesystem::path path) {
 		png_image image;
 		memset(&image, 0, sizeof(image));
 		image.version = PNG_IMAGE_VERSION;
@@ -17,7 +17,7 @@ namespace graphics {
 			buffer = new uint8_t[PNG_IMAGE_SIZE(image)];
 			if (buffer != NULL && png_image_finish_read(&image, nullptr, buffer, 0 /*row_stride*/, nullptr) != 0) {
 				// FIXME: alignment OK here or not?
-				auto i = RGBA8888Image(image.width, image.height, reinterpret_cast<uint32_t*>(buffer));
+				auto i = Image<PixelFormat::RGBA8888>(image.width, image.height, reinterpret_cast<uint8_t*>(buffer));
 				return i;
 			}
 		}
