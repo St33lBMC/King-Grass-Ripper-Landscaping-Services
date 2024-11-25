@@ -16,6 +16,7 @@
 #include <glm/matrix.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
+#include <string>
 
 //borrowed shader/obj parsing
 #include "Game.h"
@@ -41,6 +42,7 @@
 #include <sstream>
 #include <vector>
 
+#include "ecs/World.h"
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
 #include "graphics/text/Freetype.h"
@@ -124,19 +126,42 @@ GLFWwindow* initialize() {
 int main(void) {
 	GLFWwindow* window = initialize();
 
+	ecs::TypeKey key1 = ecs::TypeKey::create<int, long, ShaderIV>();
+	ecs::TypeKey key2 = ecs::TypeKey::create<long, ShaderIV, int>();
+	fmt::print("equal? {}\n", key1 == key2);
+
+	struct Sheezer {
+			float g;
+	};
+
+	ecs::Archetype archetype = ecs::Archetype::create<int, Sheezer>();
+
+	archetype.add(4, std::move(Sheezer {.g = 5.65}));
+
+	archetype.add(7, std::move(Sheezer {.g = 5.21}));
+
+	archetype.add(3, std::move(Sheezer {.g = 5.635}));
+
+	ecs::World world({archetype});
+
+	world.query<Sheezer>([](Sheezer& x) -> void { fmt::print("got: {0:.6f}\n", x.g); });
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	using namespace graphics::text;
 
 	freetype::Library library;
 
-	freetype::FontFace face(library, "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc", 0);
+	freetype::FontFace face(library, "/usr/share/fonts/truetype/freefont/FreeSerif.ttf", 0);
 
-	face.set_char_size(0, 11 * 64, 0, 0);
+	// face.set_char_size(11*64, 11 * 64, 0, 0);
 	face.set_pixel_size(300, 300);
 
-	face.load_glyph(face.char_index('F'), 0);
+	face.load_glyph(face.char_index('a'), 0);
 	face.render_glyph();
+
+	auto& glyph = face.raw()->glyph;
+
+	fmt::print("Left {} top {}\n", glyph->bitmap_left, glyph->bitmap_top);
 
 	auto tex = std::make_shared<Texture2D>();
 	tex->upload_image(face.bitmap());
