@@ -62,6 +62,7 @@ add_executable(tests
 
     tests/ecs/ecs.cpp
     tests/ecs/TypeSet.cpp
+    tests/ecs/Query.cpp
 
     src/ecs/TypeSet.cpp
 )

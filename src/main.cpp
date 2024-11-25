@@ -42,6 +42,7 @@
 #include <sstream>
 #include <vector>
 
+#include "ecs/Query.h"
 #include "ecs/World.h"
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
@@ -125,6 +126,10 @@ GLFWwindow* initialize() {
 
 int main(void) {
 	GLFWwindow* window = initialize();
+
+	ecs::Query<ecs::Component<int&>, ecs::Component<int const&>> query;
+
+	fmt::print("Uniqueness of {}, {}\n", query.m_unique_set[0], query.m_unique_set[1]);
 
 	// ecs::TypeKey key1 = ecs::TypeKey::create<int, long, ShaderIV>();
 	// ecs::TypeKey key2 = ecs::TypeKey::create<long, ShaderIV, int>();

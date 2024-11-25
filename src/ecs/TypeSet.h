@@ -7,6 +7,8 @@
 #include <span>
 #include <typeindex>
 
+#include "utils/Verify.h"
+
 namespace ecs {
 	/// Maximum number of types. Chosen to make
 	/// TypeSet exactly 512 bytes.
@@ -34,6 +36,10 @@ namespace ecs {
 				return std::span(reinterpret_cast<std::type_index const*>(m_contained_types), m_num_contained_types);
 			}
 
+			std::span<std::type_index> types() {
+				return std::span(reinterpret_cast<std::type_index*>(m_contained_types), m_num_contained_types);
+			}
+
 			/// Returns whether or not this set
 			/// contains a specific type.
 			bool contains(std::type_index cmp) const;
@@ -57,6 +63,14 @@ namespace ecs {
 				std::sort(args, args + num_types);
 
 				return TypeSet(std::span(args, num_types));
+			}
+
+			void add(std::type_index addition) {
+				if (m_num_contained_types >= MAX_TYPES) {
+					PANIC("too many types. cannot add");
+				}
+				m_num_contained_types++;
+				types()[m_num_contained_types - 1] = addition;
 			}
 	};
 }; // namespace ecs

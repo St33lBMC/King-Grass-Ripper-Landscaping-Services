@@ -2,7 +2,7 @@
 
 #include "catch2/catch_test_macros.hpp"
 
-TEST_CASE("typeset order dependence", "[TypeSet]") {
+TEST_CASE("typeset order dependence", "[ecs][TypeSet]") {
 	ecs::TypeSet set = ecs::TypeSet::create<int, long, short>();
 	ecs::TypeSet set2 = ecs::TypeSet::create<long, short, int>();
 
@@ -11,7 +11,7 @@ TEST_CASE("typeset order dependence", "[TypeSet]") {
 	REQUIRE(set2.is_subset_of(set));
 }
 
-TEST_CASE("typeset inequality", "[TypeSet]") {
+TEST_CASE("typeset inequality", "[ecs][TypeSet]") {
 	ecs::TypeSet set = ecs::TypeSet::create<int, long, short>();
 	ecs::TypeSet set2 = ecs::TypeSet::create<long, short>();
 
@@ -20,7 +20,7 @@ TEST_CASE("typeset inequality", "[TypeSet]") {
 	REQUIRE(set2.is_subset_of(set));
 }
 
-TEST_CASE("typeset indexing", "[TypeSet]") {
+TEST_CASE("typeset indexing", "[ecs][TypeSet]") {
 	ecs::TypeSet set = ecs::TypeSet::create<int, long, short>();
 	ecs::TypeSet set2 = ecs::TypeSet::create<long, short, int>();
 
