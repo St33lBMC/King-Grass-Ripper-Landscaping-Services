@@ -135,7 +135,7 @@ int main(void) {
 	face.set_char_size(0, 11 * 64, 0, 0);
 	face.set_pixel_size(300, 300);
 
-	face.load_glyph(face.char_index('C'), 0);
+	face.load_glyph(face.char_index('F'), 0);
 	face.render_glyph();
 
 	auto tex = std::make_shared<Texture2D>();
@@ -147,8 +147,6 @@ int main(void) {
 
 	// auto tex = std::make_shared<Texture2D>();
 	// tex->upload_image(graphics::ImageRef<graphics::PixelFormat::RGBA8888> { img });
-
-
 
 	Game game((Window(window)));
 	game.camera().m_aspect = 1024.f / 768.f;

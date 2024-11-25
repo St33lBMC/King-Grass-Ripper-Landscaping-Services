@@ -1,5 +1,6 @@
 #pragma once
 #include <fmt/core.h>
+
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -46,7 +47,6 @@ namespace graphics {
 			std::span<uint8_t> data() {
 				return m_data;
 			}
-
 
 			explicit ImageRef(std::span<uint8_t> data, size_t width, size_t height) :
 				m_width(width),
@@ -100,7 +100,6 @@ namespace graphics {
 			ImageRef<T> ref() {
 				return *this;
 			}
-
 	};
 
 	Image<PixelFormat::RGBA8888> from_file(std::filesystem::path path);

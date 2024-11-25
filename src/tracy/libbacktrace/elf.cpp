@@ -6964,7 +6964,7 @@ namespace tracy {
 	}
 
 #ifdef TRACY_LIBBACKTRACE_ELF_DYNLOAD_SUPPORT
-	/* Request an elf entry update if the pc passed in is not in any of the known elf ranges. 
+	/* Request an elf entry update if the pc passed in is not in any of the known elf ranges.
 This could mean that new images were dlopened and we need to add those new elf entries */
 	static int elf_refresh_address_ranges_if_needed(struct backtrace_state* state, uintptr_t pc) {
 		if (address_in_known_elf_ranges(pc)) {

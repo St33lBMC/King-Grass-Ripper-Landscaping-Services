@@ -87,7 +87,6 @@ namespace graphics::text::freetype {
 			graphics::ImageRef<PixelFormat::Grayscale8> bitmap() {
 				VERIFY(m_face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY, "Not grayscale font bitmap");
 
-
 				auto& bitmap = m_face->glyph->bitmap;
 				fmt::print("Width {} rows {} pitch {}\n", bitmap.width, bitmap.rows, bitmap.pitch);
 				return ImageRef<PixelFormat::Grayscale8>(
