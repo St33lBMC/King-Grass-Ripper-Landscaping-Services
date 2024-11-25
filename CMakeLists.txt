@@ -19,7 +19,8 @@ include_directories("src/tracy/")
 
 add_definitions(-DTRACY_ENABLE)
 
-add_executable(kinggrassripper
+set(sources ${sources}
+
     src/main.cpp
     src/gl_wrapper/shader/Shader.cpp
     src/objloader.cpp
@@ -32,8 +33,40 @@ add_executable(kinggrassripper
     src/graphics/image/Image.cpp
     src/models/ObjectModel.cpp
 
+    src/ecs/TypeSet.cpp
 
     src/tracy/TracyClient.cpp
 )
 
-target_link_libraries(kinggrassripper OpenGL::GL glfw GLEW::glew png fmt::fmt-header-only Freetype::Freetype)
+set(libraries ${libraries}
+    OpenGL::GL glfw GLEW::glew png fmt::fmt-header-only Freetype::Freetype
+)
+
+add_executable(kinggrassripper ${sources})
+
+target_link_libraries(kinggrassripper ${libraries})
+
+Include(FetchContent)
+
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v3.4.0 # or a later release
+)
+
+FetchContent_MakeAvailable(Catch2)
+
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+
+add_executable(tests
+
+    tests/ecs/ecs.cpp
+    tests/ecs/TypeSet.cpp
+
+    src/ecs/TypeSet.cpp
+)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain ${libraries})
+
+include(CTest)
+include(Catch)
+catch_discover_tests(tests)

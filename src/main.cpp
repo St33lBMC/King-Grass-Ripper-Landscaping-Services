@@ -126,9 +126,9 @@ GLFWwindow* initialize() {
 int main(void) {
 	GLFWwindow* window = initialize();
 
-	ecs::TypeKey key1 = ecs::TypeKey::create<int, long, ShaderIV>();
-	ecs::TypeKey key2 = ecs::TypeKey::create<long, ShaderIV, int>();
-	fmt::print("equal? {}\n", key1 == key2);
+	// ecs::TypeKey key1 = ecs::TypeKey::create<int, long, ShaderIV>();
+	// ecs::TypeKey key2 = ecs::TypeKey::create<long, ShaderIV, int>();
+	// fmt::print("equal? {}\n", key1 == key2);
 
 	struct Sheezer {
 			float g;
@@ -142,7 +142,15 @@ int main(void) {
 
 	archetype.add(3, std::move(Sheezer {.g = 5.635}));
 
-	ecs::World world({archetype});
+	ecs::Archetype archetype2 = ecs::Archetype::create<Sheezer>();
+
+	archetype2.add(std::move(Sheezer {.g = 3.65}));
+
+	archetype2.add(std::move(Sheezer {.g = 3.21}));
+
+	archetype2.add(std::move(Sheezer {.g = 3.635}));
+
+	ecs::World world({archetype, archetype2});
 
 	world.query<Sheezer>([](Sheezer& x) -> void { fmt::print("got: {0:.6f}\n", x.g); });
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
