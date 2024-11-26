@@ -17,13 +17,20 @@ namespace ecs {
 	class Archetype {
 			struct ComponentStore {
 					/// Type-erased pointer.
-					void* m_data_ptr;
+					void* m_data_ptr = nullptr;
 					/// The borrow state of this component.
-					BorrowState m_state = BorrowState::Shared;
+					BorrowState m_state = BorrowState::None;
 					/// The number of shared borrows.
 					size_t m_borrow_count = 0;
 					/// This type's destructor.
 					void (*m_destructor)(void*);
+
+					template<typename T> static ComponentStore create() {
+						ComponentStore store;
+						store.m_data_ptr = nullptr;
+						store.m_destructor = &destruct<T>;
+						return store;
+					}
 
 					void borrow_as(BorrowState state) {
 						VERIFY(can_borrow_with(m_state, state), "Trying to borrow when not permitted");
@@ -88,15 +95,7 @@ namespace ecs {
 			template<typename... T> static Archetype create() {
 				Archetype a(TypeSet::create<T...>());
 				a.m_num_stored = 0;
-				(a.set_data(
-					 a.m_contained_types.index_of(typeid(T)),
-					 ComponentStore {
-						 .m_destructor = &destruct<T>,
-						 .m_borrow_count = 0,
-						 .m_data_ptr = nullptr,
-						 .m_state = BorrowState::None}
-				 ),
-				 ...);
+				(a.set_data(a.m_contained_types.index_of(typeid(T)), ComponentStore::create<T>()), ...);
 				return a;
 			}
 
