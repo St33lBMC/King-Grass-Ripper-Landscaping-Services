@@ -32,6 +32,23 @@ TEST_CASE("archetype query", "[ecs][Archetype]") {
 	REQUIRE(longs.contains(5l));
 }
 
+TEST_CASE("archetype query subset", "[ecs][Archetype]") {
+	ecs::Archetype a = ecs::Archetype::create<int, long>();
+	a.add(4, 5l);
+	a.add(6l, 7);
+	a.add(9l, 21);
+
+	ecs::Query<ecs::Component<int&>> q;
+
+	std::unordered_set<int> ints;
+
+	a.satisfy(q, [&ints](int& integer) { ints.insert(integer); });
+
+	REQUIRE(ints.contains(4));
+	REQUIRE(ints.contains(7));
+	REQUIRE(ints.contains(21));
+}
+
 TEST_CASE("archetype unsatisfiable query", "[ecs][Archetype][!shouldfail]") {
 	ecs::Archetype a = ecs::Archetype::create<long>();
 
