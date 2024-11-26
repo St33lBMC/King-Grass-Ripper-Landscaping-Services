@@ -63,11 +63,12 @@ add_executable(tests
     tests/ecs/ecs.cpp
     tests/ecs/TypeSet.cpp
     tests/ecs/Query.cpp
+    tests/ecs/Archetype.cpp
 
     src/ecs/TypeSet.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain ${libraries})
-
+target_compile_definitions(tests PUBLIC TEST_MODE)
 include(CTest)
 include(Catch)
 catch_discover_tests(tests)

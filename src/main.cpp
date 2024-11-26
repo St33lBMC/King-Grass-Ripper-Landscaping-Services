@@ -17,6 +17,7 @@
 #include <glm/trigonometric.hpp>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 
 //borrowed shader/obj parsing
 #include "Game.h"
@@ -42,8 +43,8 @@
 #include <sstream>
 #include <vector>
 
+#include "ecs/Archetype.h"
 #include "ecs/Query.h"
-#include "ecs/World.h"
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
 #include "graphics/text/Freetype.h"
@@ -127,9 +128,9 @@ GLFWwindow* initialize() {
 int main(void) {
 	GLFWwindow* window = initialize();
 
-	ecs::Query<ecs::Component<int&>, ecs::Component<int const&>> query;
+	// ecs::Query<ecs::Component<int&>, ecs::Component<int const&>> query;
 
-	fmt::print("Uniqueness of {}, {}\n", query.m_unique_set[0], query.m_unique_set[1]);
+	// fmt::print("Uniqueness of {}, {}\n", query.m_unique_set[0], query.m_unique_set[1]);
 
 	// ecs::TypeKey key1 = ecs::TypeKey::create<int, long, ShaderIV>();
 	// ecs::TypeKey key2 = ecs::TypeKey::create<long, ShaderIV, int>();
@@ -139,25 +140,48 @@ int main(void) {
 			float g;
 	};
 
-	ecs::Archetype archetype = ecs::Archetype::create<int, Sheezer>();
+	ecs::Archetype a = ecs::Archetype::create<int, long>();
+	a.add(4, 5l);
+	a.add(6l, 7);
+	a.add(9l, 21);
 
-	archetype.add(4, std::move(Sheezer {.g = 5.65}));
+	ecs::Query<ecs::Component<int&>, ecs::Component<long const&>> q;
 
-	archetype.add(7, std::move(Sheezer {.g = 5.21}));
+	std::unordered_set<int> ints;
+	std::unordered_set<long> longs;
 
-	archetype.add(3, std::move(Sheezer {.g = 5.635}));
+	a.satisfy(q, [&ints, &longs](int& integer, long const& longerger) {
+		ints.insert(integer);
+		longs.insert(longerger);
+	});
 
-	ecs::Archetype archetype2 = ecs::Archetype::create<Sheezer>();
+	fmt::print("Longs: {}\n", longs.size());
 
-	archetype2.add(std::move(Sheezer {.g = 3.65}));
+	// ecs::Archetype archetype = ecs::Archetype::create<Sheezer, int>();
 
-	archetype2.add(std::move(Sheezer {.g = 3.21}));
+	// archetype.add(4, std::move(Sheezer {.g = 5.65}));
 
-	archetype2.add(std::move(Sheezer {.g = 3.635}));
+	// archetype.add(7, std::move(Sheezer {.g = 5.21}));
 
-	ecs::World world({archetype, archetype2});
+	// archetype.add(3, std::move(Sheezer {.g = 5.635}));
 
-	world.query<Sheezer>([](Sheezer& x) -> void { fmt::print("got: {0:.6f}\n", x.g); });
+	// ecs::Query<ecs::Component<int const&>> query;
+
+	// archetype.satisfy(query, [](int const& value) {
+	// 	fmt::print("Value: {}\n", value);
+	// });
+
+	// ecs::Archetype archetype2 = ecs::Archetype::create<Sheezer>();
+
+	// archetype2.add(std::move(Sheezer {.g = 3.65}));
+
+	// archetype2.add(std::move(Sheezer {.g = 3.21}));
+
+	// archetype2.add(std::move(Sheezer {.g = 3.635}));
+
+	// ecs::World world({archetype, archetype2});
+
+	// world.query<Sheezer>([](Sheezer& x) -> void { fmt::print("got: {0:.6f}\n", x.g); });
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	using namespace graphics::text;

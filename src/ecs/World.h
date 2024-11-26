@@ -49,92 +49,92 @@ namespace ecs {
 			}
 	};
 
-	class Archetype {
-			friend class World;
-			using SlotIndex = size_t;
+	// class Archetype {
+	// 		friend class World;
+	// 		using SlotIndex = size_t;
 
-			TypeSet m_key;
-			std::array<void*, MAX_TYPES> m_data;
-			size_t m_num_stored;
+	// 		TypeSet m_key;
+	// 		std::array<void*, MAX_TYPES> m_data;
+	// 		size_t m_num_stored;
 
-			Archetype(TypeSet key) : m_key(key) {}
+	// 		Archetype(TypeSet key) : m_key(key) {}
 
-		public:
-			template<typename... T> static Archetype create() {
-				Archetype a(TypeSet::create<T...>());
-				a.m_num_stored = 0;
-				return a;
-			}
+	// 	public:
+	// 		template<typename... T> static Archetype create() {
+	// 			Archetype a(TypeSet::create<T...>());
+	// 			a.m_num_stored = 0;
+	// 			return a;
+	// 		}
 
-			template<typename... T> ArchetypeView<T...> view() {
-				auto view_key = TypeSet::create<T...>();
-				VERIFY(view_key.is_subset_of(m_key), "bad view");
+	// 		template<typename... T> ArchetypeView<T...> view() {
+	// 			auto view_key = TypeSet::create<T...>();
+	// 			VERIFY(view_key.is_subset_of(m_key), "bad view");
 
-				std::array<void*, sizeof...(T)> accessors;
-				size_t i = 0;
+	// 			std::array<void*, sizeof...(T)> accessors;
+	// 			size_t i = 0;
 
-				std::type_index array[] {std::type_index(typeid(T))...};
+	// 			std::type_index array[] {std::type_index(typeid(T))...};
 
-				for (size_t iter = 0; iter < sizeof...(T); iter++) {
-					auto t = array[iter];
-					size_t index = m_key.index_of(t);
-					fmt::print("thing : in slot {} is {}\n", i, t.name());
-					accessors[i++] = m_data[index];
-				}
+	// 			for (size_t iter = 0; iter < sizeof...(T); iter++) {
+	// 				auto t = array[iter];
+	// 				size_t index = m_key.index_of(t);
+	// 				fmt::print("thing : in slot {} is {}\n", i, t.name());
+	// 				accessors[i++] = m_data[index];
+	// 			}
 
-				return ArchetypeView<T...>(m_num_stored, accessors);
-			}
+	// 			return ArchetypeView<T...>(m_num_stored, accessors);
+	// 		}
 
-			template<typename... T> SlotIndex add(T const&&... values) {
-				auto key = TypeSet::create<T...>();
-				VERIFY(key == m_key, "bad set of values");
-				// TODO ordering is UB rnlol
-				auto prev_stored = m_num_stored++;
+	// 		template<typename... T> SlotIndex add(T const&&... values) {
+	// 			auto key = TypeSet::create<T...>();
+	// 			VERIFY(key == m_key, "bad set of values");
+	// 			// TODO ordering is UB rnlol
+	// 			auto prev_stored = m_num_stored++;
 
-				(
-					[&] {
-						auto value = values;
+	// 			(
+	// 				[&] {
+	// 					auto value = values;
 
-						size_t data_slot = key.index_of(typeid(decltype(value)));
+	// 					size_t data_slot = key.index_of(typeid(decltype(value)));
 
-						decltype(value)* new_ptr =
-							reinterpret_cast<decltype(value)*>(malloc(sizeof(decltype(value)) * m_num_stored));
+	// 					decltype(value)* new_ptr =
+	// 						reinterpret_cast<decltype(value)*>(malloc(sizeof(decltype(value)) * m_num_stored));
 
-						if (prev_stored > 0) {
-							void* old_ptr = m_data[data_slot];
-							memcpy(new_ptr, old_ptr, sizeof(decltype(value)) * prev_stored);
-							free(reinterpret_cast<decltype(value)*>(old_ptr));
-						}
-						fmt::print("agh\n");
-						new_ptr[m_num_stored - 1] = std::move(value);
-						m_data[data_slot] = new_ptr;
-						fmt::print("bah\n");
-						data_slot++;
-					}(),
-					...
-				);
-				return prev_stored;
-			}
-	};
+	// 					if (prev_stored > 0) {
+	// 						void* old_ptr = m_data[data_slot];
+	// 						memcpy(new_ptr, old_ptr, sizeof(decltype(value)) * prev_stored);
+	// 						free(reinterpret_cast<decltype(value)*>(old_ptr));
+	// 					}
+	// 					fmt::print("agh\n");
+	// 					new_ptr[m_num_stored - 1] = std::move(value);
+	// 					m_data[data_slot] = new_ptr;
+	// 					fmt::print("bah\n");
+	// 					data_slot++;
+	// 				}(),
+	// 				...
+	// 			);
+	// 			return prev_stored;
+	// 		}
+	// };
 
-	class World {
-			std::vector<Archetype> m_archetypes;
+	// class World {
+	// 		std::vector<Archetype> m_archetypes;
 
-		public:
-			World(std::vector<Archetype> archetypes) : m_archetypes(archetypes) {}
+	// 	public:
+	// 		World(std::vector<Archetype> archetypes) : m_archetypes(archetypes) {}
 
-			template<typename... Ts, typename Query> void query(Query query) {
-				TypeSet key = TypeSet::create<Ts...>();
-				for (auto archetype : m_archetypes) {
-					if (key.is_subset_of(archetype.m_key)) {
-						ArchetypeView<Ts...> view = archetype.view<Ts...>();
+	// 		template<typename... Ts, typename Query> void query(Query query) {
+	// 			TypeSet key = TypeSet::create<Ts...>();
+	// 			for (auto archetype : m_archetypes) {
+	// 				if (key.is_subset_of(archetype.m_key)) {
+	// 					ArchetypeView<Ts...> view = archetype.view<Ts...>();
 
-						for (size_t index = 0; index < view.num_values(); index++) {
-							query((std::forward<Ts&>(view.template get<Ts>(index)), ...));
-						}
-					}
-				}
-			}
-	};
+	// 					for (size_t index = 0; index < view.num_values(); index++) {
+	// 						query((std::forward<Ts&>(view.template get<Ts>(index)), ...));
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// };
 
 } // namespace ecs

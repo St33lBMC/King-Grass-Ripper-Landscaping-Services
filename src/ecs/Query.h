@@ -4,6 +4,7 @@
 #include <bitset>
 #include <type_traits>
 
+#include "ecs/BorrowState.h"
 #include "ecs/TypeSet.h"
 
 namespace ecs {
@@ -15,6 +16,17 @@ namespace ecs {
 
 			static constexpr bool UNIQUE = !std::is_const_v<std::remove_reference_t<T>>;
 			using Type = std::remove_reference_t<T>;
+			using RefType = T;
+	};
+
+	template<typename T> struct Underlying {
+			using Type = void;
+			using RefType = void;
+	};
+
+	template<typename T> struct Underlying<Component<T>> {
+			using Type = typename Component<T>::Type;
+			using RefType = typename Component<T>::RefType;
 	};
 
 	template<typename T> struct Badge {};
@@ -43,6 +55,13 @@ namespace ecs {
 			Query() : m_contained_types(TypeSet::create()) {
 				size_t index = 0;
 				(inner(Badge<T>(), index++), ...);
+			}
+
+			BorrowState borrow(size_t index) {
+				if (m_unique_set[index])
+					return BorrowState::Unique;
+				else
+					return BorrowState::Shared;
 			}
 	};
 

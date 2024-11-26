@@ -30,6 +30,10 @@ namespace ecs {
 			/// Returns the index of a type within this set.
 			size_t index_of(std::type_index const& target);
 
+			size_t size() {
+				return m_num_contained_types;
+			}
+
 			/// Returns a span to the contained types, not
 			/// the whole backing storage.
 			std::span<const std::type_index> types() const {
