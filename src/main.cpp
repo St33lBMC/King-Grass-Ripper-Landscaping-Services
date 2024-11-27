@@ -75,6 +75,12 @@ extern "C" void print_glerror(
 	const GLchar* message,
 	const void* userParam
 ) {
+	(void)source;
+	(void)type;
+	(void)id;
+	(void)severity;
+	(void)length;
+	(void)userParam;
 	fmt::print("OpenGL error: {}", message);
 }
 
