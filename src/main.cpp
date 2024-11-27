@@ -218,12 +218,12 @@ int main(void) {
 
 	Game game((Window(window)));
 	game.camera().m_aspect = 1024.f / 768.f;
-	models::ObjectModel cube_obj("../src/cube.obj");
+	models::ObjectModel cube_obj("../assets/models/cube.obj");
 	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1), tex));
 	cube_obj.upload_to(cube);
 	cube.transform() = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0));
 
-	models::ObjectModel book_obj("../src/book.obj");
+	models::ObjectModel book_obj("../assets/models/book.obj");
 	graphics::Model book(graphics::Material(glm::vec4(1, 0, 0, 1), tex));
 	book_obj.upload_to(book);
 	book.transform() = glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0));
