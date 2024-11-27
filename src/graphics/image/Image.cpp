@@ -4,7 +4,7 @@
 
 #include "utils/Verify.h"
 
-namespace graphics {
+namespace graphics::image {
 
 	Image<PixelFormat::RGBA8888> from_file(std::filesystem::path path) {
 		png_image image;
@@ -23,4 +23,4 @@ namespace graphics {
 		}
 		VERIFY_NOT_REACHED();
 	}
-} // namespace graphics
+} // namespace graphics::image

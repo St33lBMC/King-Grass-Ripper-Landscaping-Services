@@ -10,7 +10,9 @@
 #include "graphics/image/Image.h"
 #include "utils/Verify.h"
 
-namespace gl_wrapper {
+namespace gl_wrapper::texture {
+
+	using namespace graphics::image;
 
 	using TextureDestructor = decltype(GL_DEST(id) { return glDeleteTextures(1, &id); });
 	using TextureConstructor = decltype([]() -> GLuint {
@@ -41,18 +43,18 @@ namespace gl_wrapper {
 				Texture::bind_texture(TextureBindTarget::Texture2D);
 			}
 
-			template<graphics::PixelFormat T> void upload_image(graphics::ImageRef<T> image) {
+			template<PixelFormat T> void upload_image(ImageRef<T> image) {
 				bind_texture();
 				ImageFormat2D gl_image_format;
 
 				switch (T) {
-					case graphics::PixelFormat::RGBA8888:
+					case PixelFormat::RGBA8888:
 						gl_image_format = ImageFormat2D::RGBA;
 						break;
-					case graphics::PixelFormat::RGB888:
+					case PixelFormat::RGB888:
 						gl_image_format = ImageFormat2D::RGB;
 						break;
-					case graphics::PixelFormat::Grayscale8:
+					case PixelFormat::Grayscale8:
 						gl_image_format = ImageFormat2D::Red;
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
@@ -78,4 +80,4 @@ namespace gl_wrapper {
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			}
 	};
-} // namespace gl_wrapper
+} // namespace gl_wrapper::texture

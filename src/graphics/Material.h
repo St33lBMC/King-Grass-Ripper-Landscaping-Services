@@ -7,7 +7,7 @@
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/texture/Texture.h"
 
-using namespace gl_wrapper;
+using namespace gl_wrapper::texture;
 
 namespace graphics {
 	struct Material {

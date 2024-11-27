@@ -10,7 +10,9 @@
 #include FT_MODULE_H
 #include FT_BITMAP_H
 
-namespace graphics::text::freetype {
+namespace graphics::text {
+
+	using namespace graphics::image;
 
 	class Library {
 			FT_Library m_library;
@@ -84,7 +86,7 @@ namespace graphics::text::freetype {
 				}
 			}
 
-			graphics::ImageRef<PixelFormat::Grayscale8> bitmap() {
+			ImageRef<PixelFormat::Grayscale8> bitmap() {
 				VERIFY(m_face->glyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY, "Not grayscale font bitmap");
 
 				auto& bitmap = m_face->glyph->bitmap;
@@ -109,4 +111,4 @@ namespace graphics::text::freetype {
 			}
 	};
 
-}; // namespace graphics::text::freetype
+}; // namespace graphics::text

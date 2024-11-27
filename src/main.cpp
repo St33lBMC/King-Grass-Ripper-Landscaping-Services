@@ -190,11 +190,11 @@ int main(void) {
 	// world.query<Sheezer>([](Sheezer& x) -> void { fmt::print("got: {0:.6f}\n", x.g); });
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	using namespace graphics::text;
+	using namespace graphics;
 
-	freetype::Library library;
+	text::Library library;
 
-	freetype::FontFace face(library, "/usr/share/fonts/truetype/freefont/FreeSerif.ttf", 0);
+	text::FontFace face(library, "/usr/share/fonts/truetype/freefont/FreeSerif.ttf", 0);
 
 	// face.set_char_size(11*64, 11 * 64, 0, 0);
 	face.set_pixel_size(300, 300);

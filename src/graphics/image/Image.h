@@ -11,7 +11,7 @@
 
 #include "utils/Verify.h"
 
-namespace graphics {
+namespace graphics::image {
 
 	enum class PixelFormat { RGBA8888, RGB888, Grayscale8 };
 
@@ -103,4 +103,4 @@ namespace graphics {
 	};
 
 	Image<PixelFormat::RGBA8888> from_file(std::filesystem::path path);
-} // namespace graphics
+} // namespace graphics::image
