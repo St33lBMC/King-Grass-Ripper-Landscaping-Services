@@ -125,7 +125,7 @@ GLFWwindow* initialize() {
 	// glDebugMessageCallback(print_glerror, "abc");
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	TracyGpuContext;
 
 	return window;
@@ -194,18 +194,16 @@ int main(void) {
 
 	text::Library library;
 
-	text::FontFace face(library, "/usr/share/fonts/truetype/freefont/FreeSerif.ttf", 0);
+	text::FontFace face(library, "/usr/share/fonts/truetype/ubuntu/Ubuntu-BI.ttf", 0);
 
-	// face.set_char_size(11*64, 11 * 64, 0, 0);
-	face.set_pixel_size(300, 300);
-
-	face.load_glyph(face.char_index('a'), 0);
+	face.set_pixel_size(0, 512);
+	auto load_flags = 1L << 6;
+	face.load_glyph(face.char_index('B'), load_flags);
 	face.render_glyph();
 
 	auto& glyph = face.raw()->glyph;
 
 	fmt::print("Left {} top {}\n", glyph->bitmap_left, glyph->bitmap_top);
-
 	auto tex = std::make_shared<Texture2D>();
 	tex->upload_image(face.bitmap());
 
