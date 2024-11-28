@@ -34,7 +34,7 @@ set(sources ${sources}
     src/models/ObjectModel.cpp
 
     src/ecs/TypeSet.cpp
-
+    src/ecs/Archetype.cpp
     src/tracy/TracyClient.cpp
 )
 
@@ -66,6 +66,7 @@ add_executable(tests
     tests/ecs/Archetype.cpp
 
     src/ecs/TypeSet.cpp
+    src/ecs/Archetype.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain ${libraries})
 target_compile_definitions(tests PUBLIC TEST_MODE)

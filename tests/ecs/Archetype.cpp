@@ -1,6 +1,7 @@
 #include "ecs/Archetype.h"
 
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "catch2/catch_test_macros.hpp"
@@ -55,4 +56,28 @@ TEST_CASE("archetype unsatisfiable query", "[ecs][Archetype][!shouldfail]") {
 	ecs::Query<ecs::Component<int&>> q;
 
 	a.satisfy(q, [](int&) { (void)0; });
+}
+
+TEST_CASE("archetype destructors", "[ecs][Archetype]") {
+	struct Cool {
+			int* target;
+
+			Cool(int* b) : target(b) {}
+
+			~Cool() {
+				(*target) = (*target) + 1;
+			}
+	};
+
+	int counter = 0;
+	Cool c = Cool(&counter);
+	{
+		ecs::Archetype a = ecs::Archetype::create<Cool>();
+		a.add((Cool &&) c);
+		a.add((Cool &&) c);
+		a.add((Cool &&) c);
+		a.add((Cool &&) c);
+		a.add((Cool &&) c);
+	}
+	REQUIRE(counter == 5);
 }

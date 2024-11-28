@@ -1,7 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 #include "ecs/BorrowState.h"
 #include "ecs/Query.h"
@@ -22,32 +24,27 @@ namespace ecs {
 					BorrowState m_state = BorrowState::None;
 					/// The number of shared borrows.
 					size_t m_borrow_count = 0;
+					/// The stride of this type.
+					size_t m_stride;
 					/// This type's destructor.
-					void (*m_destructor)(void*);
+					void (*m_destructor)(void*) = nullptr;
+
+					ComponentStore(size_t stride = 0) : m_stride(stride) {}
 
 					template<typename T> static ComponentStore create() {
-						ComponentStore store;
+						ComponentStore store(std::max(alignof(T), sizeof(T)));
 						store.m_data_ptr = nullptr;
-						store.m_destructor = &destruct<T>;
+						if constexpr (std::is_trivially_destructible_v<T>) {
+							store.m_destructor = nullptr;
+						} else {
+							store.m_destructor = &destruct<T>;
+						}
 						return store;
 					}
 
-					void borrow_as(BorrowState state) {
-						VERIFY(can_borrow_with(m_state, state), "Trying to borrow when not permitted");
-						m_state = state;
-						if (m_state == BorrowState::Shared)
-							m_borrow_count++;
-					}
+					void borrow_as(BorrowState state);
 
-					void release_borrow() {
-						VERIFY(m_state != BorrowState::None, "already unborrowed");
-						if (m_state == BorrowState::Shared) {
-							if (--m_borrow_count > 0) {
-								return; // still shared borrow
-							}
-						}
-						m_state = BorrowState::None;
-					}
+					void release_borrow();
 			};
 
 			friend class World;
@@ -106,10 +103,10 @@ namespace ecs {
 				// For every type we are trying to add,
 				(
 					[&] {
-						auto value = values;
+						auto& value = values;
 
 						// grab its defined index
-						size_t data_slot = m_contained_types.index_of(typeid(decltype(value)));
+						size_t data_slot = m_contained_types.index_of(typeid(T));
 
 						// check that it is not uniquely borrowed
 						if (m_data[data_slot].m_state == BorrowState::Unique) {
@@ -117,14 +114,13 @@ namespace ecs {
 						}
 
 						// allocate new memory for it
-						decltype(value)* new_ptr =
-							reinterpret_cast<decltype(value)*>(malloc(sizeof(decltype(value)) * m_num_stored));
+						T* new_ptr = reinterpret_cast<T*>(malloc(sizeof(T) * m_num_stored));
 
 						if (prev_stored > 0) {
 							// deallocate the old memory, if necessary
 							void* old_ptr = m_data[data_slot].m_data_ptr;
-							memcpy(new_ptr, old_ptr, sizeof(decltype(value)) * prev_stored);
-							free(reinterpret_cast<decltype(value)*>(old_ptr));
+							memcpy(new_ptr, old_ptr, sizeof(T) * prev_stored);
+							free(reinterpret_cast<T*>(old_ptr));
 						}
 						new_ptr[m_num_stored - 1] = std::move(value);
 						m_data[data_slot].m_data_ptr = new_ptr;
@@ -135,6 +131,8 @@ namespace ecs {
 				);
 				return prev_stored;
 			}
+
+			~Archetype();
 	};
 
 } // namespace ecs
