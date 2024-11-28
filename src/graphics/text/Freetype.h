@@ -84,6 +84,18 @@ namespace graphics::text {
 				if (error) {
 					PANIC("freetype glyph render failed: {}", FT_Error_String(error));
 				}
+
+				FT_Bitmap aligned_bitmap;
+				FT_Bitmap_New(&aligned_bitmap);
+				FT_Bitmap_Convert(
+					m_library.raw(),
+					&m_face->glyph->bitmap,
+					&aligned_bitmap,
+					4
+				); // alignment of 4 for OpenGL
+				auto old = m_face->glyph->bitmap;
+				m_face->glyph->bitmap = aligned_bitmap;
+				FT_Bitmap_Done(m_library.raw(), &old);
 			}
 
 			ImageRef<PixelFormat::Grayscale8> bitmap() {
