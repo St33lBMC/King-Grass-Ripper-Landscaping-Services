@@ -18,7 +18,7 @@ namespace graphics {
 				m_colour(colour),
 				m_texture(texture) {}
 
-			void upload_uniform(gl_wrapper::shader::Program& program, std::string base) {
+			void upload_uniform(gl_wrapper::shader::Program& program, std::string base) const {
 				program.set_uniform(base + ".colour", m_colour);
 				// FIXME: texture units?
 				Texture::set_active_texture(GL_TEXTURE0);

@@ -25,6 +25,8 @@ namespace gl_wrapper {
 				this->m_raw_id = other.m_raw_id;
 			}
 
+			GLObject& operator=(GLObject&&) = default;
+
 			GLuint raw_id() {
 				return m_raw_id;
 			}

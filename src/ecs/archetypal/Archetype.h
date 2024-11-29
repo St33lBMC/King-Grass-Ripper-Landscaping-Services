@@ -3,14 +3,15 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <type_traits>
 
-#include "ecs/BorrowState.h"
 #include "ecs/Query.h"
-#include "ecs/TypeSet.h"
+#include "ecs/archetypal/BorrowState.h"
+#include "ecs/archetypal/TypeSet.h"
 #include "utils/Verify.h"
 
-namespace ecs {
+namespace ecs::archetypal {
 
 	template<class T> void destruct(void* x) {
 		reinterpret_cast<const T*>(x)->~T();
@@ -48,7 +49,6 @@ namespace ecs {
 			};
 
 			friend class World;
-			using SlotIndex = size_t;
 
 			TypeSet m_contained_types;
 			std::array<ComponentStore, MAX_TYPES> m_data;
@@ -73,6 +73,8 @@ namespace ecs {
 			}
 
 		public:
+			using SlotIndex = size_t;
+
 			template<typename... T, typename Handler> void satisfy(Query<T...> query, Handler handler) {
 				VERIFY(query.m_contained_types.is_subset_of(m_contained_types), "Bad query");
 
@@ -96,7 +98,7 @@ namespace ecs {
 				return a;
 			}
 
-			template<typename... T> SlotIndex add(T const&&... values) {
+			template<typename... T> SlotIndex add(T&&... values) {
 				auto types = TypeSet::create<T...>();
 				VERIFY(types == m_contained_types, "trying to add with wrong types");
 				auto prev_stored = m_num_stored++;
@@ -114,7 +116,7 @@ namespace ecs {
 						}
 
 						// allocate new memory for it
-						T* new_ptr = reinterpret_cast<T*>(malloc(sizeof(T) * m_num_stored));
+						T* new_ptr = reinterpret_cast<T*>(aligned_alloc(alignof(T), sizeof(T) * m_num_stored));
 
 						if (prev_stored > 0) {
 							// deallocate the old memory, if necessary
@@ -122,7 +124,7 @@ namespace ecs {
 							memcpy(new_ptr, old_ptr, sizeof(T) * prev_stored);
 							free(reinterpret_cast<T*>(old_ptr));
 						}
-						new_ptr[m_num_stored - 1] = std::move(value);
+						new (&new_ptr[m_num_stored - 1]) T(std::move(value));
 						m_data[data_slot].m_data_ptr = new_ptr;
 
 						data_slot++;
@@ -135,4 +137,4 @@ namespace ecs {
 			~Archetype();
 	};
 
-} // namespace ecs
+} // namespace ecs::archetypal

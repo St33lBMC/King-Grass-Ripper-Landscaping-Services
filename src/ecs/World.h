@@ -1,140 +1,106 @@
 #pragma once
+
 #include <fmt/core.h>
 
-#include <algorithm>
-#include <array>
-#include <cstddef>
+#include <concepts>
 #include <cstdint>
-#include <cstring>
-#include <functional>
-#include <span>
-#include <typeindex>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
-#include "ecs/TypeSet.h"
+#include "ecs/System.h"
+#include "ecs/archetypal/Archetype.h"
+#include "ecs/archetypal/Arena.h"
+#include "ecs/archetypal/TypeSet.h"
 #include "utils/Verify.h"
 
 namespace ecs {
+	using namespace ecs::archetypal;
 
-	template<typename T, typename... Ts> struct Index;
+	class World;
 
-	template<typename T, typename... Ts> struct Index<T, T, Ts...>: std::integral_constant<std::size_t, 0> {};
+	template<typename T>
+	concept SystemParameter = requires(World& world) {
+		{ T::value_from_world(world) } -> std::convertible_to<typename T::PassedValue>;
+	};
 
-	template<typename T, typename U, typename... Ts> struct Index<T, U, Ts...>:
-		std::integral_constant<std::size_t, 1 + Index<T, Ts...>::value> {};
-
-	template<typename... T> class ArchetypeView {
-			friend class Archetype;
-
-			TypeSet m_key;
-
-			std::array<void*, sizeof...(T)> m_accessors;
-			size_t m_num_values;
-
-			ArchetypeView(size_t num_values, std::array<void*, sizeof...(T)> accessors) :
-				m_key(TypeSet::create<T...>()),
-				m_accessors(accessors),
-				m_num_values(num_values) {}
+	class WorldView {
+			World& m_world;
 
 		public:
-			template<typename A> A& get(size_t index) {
-				VERIFY(index < m_num_values, "out-of-bounds access");
-				auto type_index = Index<A, T...>::value;
-				fmt::print("Type index {}\n", type_index);
-				return reinterpret_cast<A*>(m_accessors[type_index])[index];
+			WorldView(World& world) : m_world(world) {}
+
+			template<typename... T, typename Handler> void satisfy(Query<T...>& query, Handler handler);
+	};
+
+	class World {
+			struct EntityEntry {
+					TypeSet archetype;
+					Archetype::SlotIndex index;
+
+					EntityEntry(TypeSet archetype, Archetype::SlotIndex index) : archetype(archetype), index(index) {}
+			};
+
+			using System = std::function<void(World&)>;
+
+			std::unordered_map<TypeSet, Archetype> m_archetypes = {};
+
+			Arena<EntityEntry> m_entities;
+
+			std::vector<System> m_systems;
+
+			CommandQueue m_command_queue;
+
+			using Entity = Arena<EntityEntry>::ArenaIndex;
+
+		public:
+			template<typename... Components> Entity add(Components&&... components) {
+				TypeSet set = TypeSet::create<Components...>();
+
+				auto& [_, archetype] = *m_archetypes.try_emplace(set, Archetype::create<Components...>()).first;
+
+				Archetype::SlotIndex index = archetype.add(std::forward<Components&&>(components)...);
+
+				return m_entities.add(EntityEntry(set, index));
 			}
 
-			size_t num_values() {
-				return m_num_values;
+			template<SystemParameter... SystemParameters> void add_system(
+				std::function<void(CommandQueue&, WorldView, typeof(typename SystemParameters::PassedValue)...)> func
+			) {
+				m_systems.push_back([func](World& world) {
+					func(world.m_command_queue, WorldView(world), SystemParameters::value_from_world(world)...);
+				});
+			}
+
+			template<typename... T, typename Handler> void satisfy(Query<T...>& query, Handler handler) {
+				TypeSet set = TypeSet::create<T...>();
+				for (auto& [key, archetype] : m_archetypes) {
+					if (query.m_contained_types.is_subset_of(key)) {
+						archetype.satisfy(query, handler);
+					}
+				}
+			}
+
+			void run() {
+				for (System& system : m_systems) {
+					(system)(*this);
+				}
 			}
 	};
 
-	// class Archetype {
-	// 		friend class World;
-	// 		using SlotIndex = size_t;
+	template<typename... T, typename Handler> void WorldView::satisfy(Query<T...>& query, Handler handler) {
+		m_world.satisfy(query, handler);
+	}
 
-	// 		TypeSet m_key;
-	// 		std::array<void*, MAX_TYPES> m_data;
-	// 		size_t m_num_stored;
+	template<typename ResourceType> struct Resource {
+			static_assert(std::is_reference_v<ResourceType>, "must be a reference");
 
-	// 		Archetype(TypeSet key) : m_key(key) {}
+			using PassedValue = ResourceType;
 
-	// 	public:
-	// 		template<typename... T> static Archetype create() {
-	// 			Archetype a(TypeSet::create<T...>());
-	// 			a.m_num_stored = 0;
-	// 			return a;
-	// 		}
-
-	// 		template<typename... T> ArchetypeView<T...> view() {
-	// 			auto view_key = TypeSet::create<T...>();
-	// 			VERIFY(view_key.is_subset_of(m_key), "bad view");
-
-	// 			std::array<void*, sizeof...(T)> accessors;
-	// 			size_t i = 0;
-
-	// 			std::type_index array[] {std::type_index(typeid(T))...};
-
-	// 			for (size_t iter = 0; iter < sizeof...(T); iter++) {
-	// 				auto t = array[iter];
-	// 				size_t index = m_key.index_of(t);
-	// 				fmt::print("thing : in slot {} is {}\n", i, t.name());
-	// 				accessors[i++] = m_data[index];
-	// 			}
-
-	// 			return ArchetypeView<T...>(m_num_stored, accessors);
-	// 		}
-
-	// 		template<typename... T> SlotIndex add(T const&&... values) {
-	// 			auto key = TypeSet::create<T...>();
-	// 			VERIFY(key == m_key, "bad set of values");
-	// 			// TODO ordering is UB rnlol
-	// 			auto prev_stored = m_num_stored++;
-
-	// 			(
-	// 				[&] {
-	// 					auto value = values;
-
-	// 					size_t data_slot = key.index_of(typeid(decltype(value)));
-
-	// 					decltype(value)* new_ptr =
-	// 						reinterpret_cast<decltype(value)*>(malloc(sizeof(decltype(value)) * m_num_stored));
-
-	// 					if (prev_stored > 0) {
-	// 						void* old_ptr = m_data[data_slot];
-	// 						memcpy(new_ptr, old_ptr, sizeof(decltype(value)) * prev_stored);
-	// 						free(reinterpret_cast<decltype(value)*>(old_ptr));
-	// 					}
-	// 					fmt::print("agh\n");
-	// 					new_ptr[m_num_stored - 1] = std::move(value);
-	// 					m_data[data_slot] = new_ptr;
-	// 					fmt::print("bah\n");
-	// 					data_slot++;
-	// 				}(),
-	// 				...
-	// 			);
-	// 			return prev_stored;
-	// 		}
-	// };
-
-	// class World {
-	// 		std::vector<Archetype> m_archetypes;
-
-	// 	public:
-	// 		World(std::vector<Archetype> archetypes) : m_archetypes(archetypes) {}
-
-	// 		template<typename... Ts, typename Query> void query(Query query) {
-	// 			TypeSet key = TypeSet::create<Ts...>();
-	// 			for (auto archetype : m_archetypes) {
-	// 				if (key.is_subset_of(archetype.m_key)) {
-	// 					ArchetypeView<Ts...> view = archetype.view<Ts...>();
-
-	// 					for (size_t index = 0; index < view.num_values(); index++) {
-	// 						query((std::forward<Ts&>(view.template get<Ts>(index)), ...));
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// };
+			static ResourceType value_from_world(World& world) {
+				(void)world;
+				PANIC("unreachable")
+			}
+	};
 
 } // namespace ecs

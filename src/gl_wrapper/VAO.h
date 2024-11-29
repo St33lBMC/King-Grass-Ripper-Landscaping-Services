@@ -12,7 +12,7 @@ namespace gl_wrapper {
 
 	class VAO: public GLObject<VAO, VAOConstructor, VAODestructor> {
 		public:
-			void bind() {
+			void bind() const {
 				glBindVertexArray(m_raw_id);
 			}
 	};

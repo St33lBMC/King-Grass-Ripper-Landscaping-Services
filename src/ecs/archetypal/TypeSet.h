@@ -4,12 +4,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <functional>
 #include <span>
 #include <typeindex>
 
 #include "utils/Verify.h"
 
-namespace ecs {
+namespace ecs::archetypal {
 	/// Maximum number of types. Chosen to make
 	/// TypeSet exactly 512 bytes.
 	constexpr static size_t MAX_TYPES = 63;
@@ -28,9 +29,9 @@ namespace ecs {
 
 		public:
 			/// Returns the index of a type within this set.
-			size_t index_of(std::type_index const& target);
+			size_t index_of(std::type_index const& target) const;
 
-			size_t size() {
+			size_t size() const {
 				return m_num_contained_types;
 			}
 
@@ -77,4 +78,19 @@ namespace ecs {
 				types()[m_num_contained_types - 1] = addition;
 			}
 	};
-}; // namespace ecs
+
+}; // namespace ecs::archetypal
+
+template<> struct std::hash<ecs::archetypal::TypeSet> {
+		const uint64_t SEED = 0x517cc1b727220a95;
+
+		size_t operator()(const ecs::archetypal::TypeSet& set) const {
+			size_t hash = set.size();
+			for (std::type_index index : set.types()) {
+				hash <<= 5;
+				hash ^= std::hash<std::type_index>()(index);
+				hash *= SEED;
+			}
+			return hash;
+		}
+};

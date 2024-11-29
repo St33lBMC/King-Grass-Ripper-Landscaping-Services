@@ -54,7 +54,7 @@ namespace gl_wrapper::buffer {
 				Buffer::bind(BufferBindingTarget::ArrayBuffer);
 			}
 
-			size_t size() {
+			size_t size() const {
 				return m_num_elements;
 			}
 

@@ -1,10 +1,12 @@
-#include "ecs/TypeSet.h"
+#include "ecs/archetypal/TypeSet.h"
 
 #include "catch2/catch_test_macros.hpp"
 
+using namespace ecs::archetypal;
+
 TEST_CASE("typeset order dependence", "[ecs][TypeSet]") {
-	ecs::TypeSet set = ecs::TypeSet::create<int, long, short>();
-	ecs::TypeSet set2 = ecs::TypeSet::create<long, short, int>();
+	TypeSet set = TypeSet::create<int, long, short>();
+	TypeSet set2 = TypeSet::create<long, short, int>();
 
 	REQUIRE(set == set2);
 	REQUIRE(set.is_subset_of(set2));
@@ -12,8 +14,8 @@ TEST_CASE("typeset order dependence", "[ecs][TypeSet]") {
 }
 
 TEST_CASE("typeset inequality", "[ecs][TypeSet]") {
-	ecs::TypeSet set = ecs::TypeSet::create<int, long, short>();
-	ecs::TypeSet set2 = ecs::TypeSet::create<long, short>();
+	TypeSet set = TypeSet::create<int, long, short>();
+	TypeSet set2 = TypeSet::create<long, short>();
 
 	REQUIRE(set != set2);
 	REQUIRE(!set.is_subset_of(set2));
@@ -21,8 +23,8 @@ TEST_CASE("typeset inequality", "[ecs][TypeSet]") {
 }
 
 TEST_CASE("typeset indexing", "[ecs][TypeSet]") {
-	ecs::TypeSet set = ecs::TypeSet::create<int, long, short>();
-	ecs::TypeSet set2 = ecs::TypeSet::create<long, short, int>();
+	TypeSet set = TypeSet::create<int, long, short>();
+	TypeSet set2 = TypeSet::create<long, short, int>();
 
 	REQUIRE(set.index_of(typeid(int)) == set2.index_of(typeid(int)));
 	REQUIRE(set.index_of(typeid(long)) == set2.index_of(typeid(long)));

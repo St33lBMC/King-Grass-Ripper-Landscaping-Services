@@ -1,13 +1,18 @@
 #include "Game.h"
 
-#include <fstream>
+#include <fmt/core.h>
 
+#include <fstream>
+#include <glm/fwd.hpp>
+
+#include "ecs/Query.h"
+#include "ecs/World.h"
 #include "graphics/Model.h"
 #include "models/ObjectModel.h"
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
 
-void Game::loop(std::vector<graphics::Model> models) {
+void Game::loop() {
 	do {
 		FrameMark;
 		m_movement.process_movement(m_window, m_camera);
@@ -16,9 +21,7 @@ void Game::loop(std::vector<graphics::Model> models) {
 		// Clear the screen.
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for (auto& model : models) {
-			model.draw(m_shader_program);
-		}
+		m_world.run();
 
 		// Swap buffers
 		m_window.swap_buffers();
@@ -44,7 +47,10 @@ std::string get_file_contents(const char* filename) {
 	PANIC("read of {} failed: {}", filename, std::strerror(errno));
 }
 
-Game::Game(Window&& window) : m_camera(glm::vec3(0, 0, 0)), m_window(std::move(window)) {
+Game::Game(Window&& window, ecs::World&& world) :
+	m_camera(glm::vec3(0, 0, 0)),
+	m_window(std::move(window)),
+	m_world(world) {
 	auto vertex_shader = Shader(ShaderType::Vertex);
 	auto fragment_shader = Shader(ShaderType::Fragment);
 
@@ -68,4 +74,17 @@ Game::Game(Window&& window) : m_camera(glm::vec3(0, 0, 0)), m_window(std::move(w
 	glm::mat4 model_matrix = glm::mat4(1.0);
 	m_shader_program.set_uniform("model_matrix", model_matrix);
 	m_shader_program.set_uniform("projection_matrix", m_camera.perspective());
+
+	m_world.add_system<ecs::Query<ecs::Component<glm::vec3 const&>, ecs::Component<graphics::Model const&>>>(
+		[this](
+			ecs::CommandQueue&,
+			ecs::WorldView world,
+			ecs::Query<ecs::Component<glm::vec3 const&>, ecs::Component<graphics::Model const&>> query
+		) {
+			world.satisfy(query, [this](glm::vec3 const& position, graphics::Model const& model) {
+				//fmt::print("this does indeed have side effects\n");
+				model.draw(m_shader_program, glm::translate(glm::mat4(1.0f), position));
+			});
+		}
+	);
 }

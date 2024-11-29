@@ -1,6 +1,6 @@
-#include "ecs/Archetype.h"
+#include "ecs/archetypal/Archetype.h"
 
-namespace ecs {
+namespace ecs::archetypal {
 
 	void Archetype::ComponentStore::borrow_as(BorrowState state) {
 		VERIFY(can_borrow_with(m_state, state), "Trying to borrow when not permitted");
@@ -31,4 +31,4 @@ namespace ecs {
 			free(store.m_data_ptr);
 		}
 	}
-}; // namespace ecs
+}; // namespace ecs::archetypal

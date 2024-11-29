@@ -33,8 +33,8 @@ set(sources ${sources}
     src/graphics/image/Image.cpp
     src/models/ObjectModel.cpp
 
-    src/ecs/TypeSet.cpp
-    src/ecs/Archetype.cpp
+    src/ecs/archetypal/TypeSet.cpp
+    src/ecs/archetypal/Archetype.cpp
     src/tracy/TracyClient.cpp
 )
 
@@ -64,9 +64,10 @@ add_executable(tests
     tests/ecs/TypeSet.cpp
     tests/ecs/Query.cpp
     tests/ecs/Archetype.cpp
+    tests/ecs/Arena.cpp
 
-    src/ecs/TypeSet.cpp
-    src/ecs/Archetype.cpp
+    src/ecs/archetypal/TypeSet.cpp
+    src/ecs/archetypal/Archetype.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain ${libraries})
 target_compile_definitions(tests PUBLIC TEST_MODE)

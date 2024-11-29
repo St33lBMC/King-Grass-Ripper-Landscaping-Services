@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/ext.hpp>
+#include <glm/fwd.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 
 #include "gl_wrapper/VAO.h"
@@ -42,12 +44,20 @@ namespace graphics {
 				return m_model_transform;
 			}
 
+			Material const& material() const {
+				return m_material;
+			}
+
+			glm::mat4 const& transform() const {
+				return m_model_transform;
+			}
+
 			Model(Material material);
 
-			void draw(shader::Program& program) {
+			void draw(shader::Program& program, glm::mat4 const& additional_transform) const {
 				ZoneScoped;
 				TracyGpuZone("model draw");
-				program.set_uniform("model_matrix", transform());
+				program.set_uniform("model_matrix", transform() * additional_transform);
 				m_material.upload_uniform(program, "material");
 				m_vao.bind();
 				glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());

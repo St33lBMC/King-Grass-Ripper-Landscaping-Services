@@ -3,6 +3,7 @@
 #include <glm/fwd.hpp>
 #include <memory>
 
+#include "ecs/World.h"
 #include "gl_wrapper/shader/Shader.h"
 #include "graphics/Model.h"
 #include "models/ObjectModel.h"
@@ -18,14 +19,15 @@ class Game {
 		Program m_shader_program;
 		Window m_window;
 		Movement m_movement;
+		ecs::World m_world;
 
 	public:
-		Game(Window&& window);
+		Game(Window&& window, ecs::World&& world);
 
 		Camera& camera() {
 			return m_camera;
 		}
 
 		/// Runs the game loop.
-		void loop(std::vector<graphics::Model>);
+		void loop();
 };

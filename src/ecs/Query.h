@@ -4,10 +4,12 @@
 #include <bitset>
 #include <type_traits>
 
-#include "ecs/BorrowState.h"
-#include "ecs/TypeSet.h"
+#include "ecs/archetypal/BorrowState.h"
+#include "ecs/archetypal/TypeSet.h"
 
 namespace ecs {
+	// fwd
+	class World;
 
 	/// Marker type for use in a `Query`.
 	/// Const references are shared, normal references are taken uniquely.
@@ -19,10 +21,7 @@ namespace ecs {
 			using RefType = T;
 	};
 
-	template<typename T> struct Underlying {
-			using Type = void;
-			using RefType = void;
-	};
+	template<typename T> struct Underlying;
 
 	template<typename T> struct Underlying<Component<T>> {
 			using Type = typename Component<T>::Type;
@@ -32,15 +31,18 @@ namespace ecs {
 	template<typename T> struct Badge {};
 
 	/// Represents a query.
-	template<typename... T> struct Query {
-			static_assert(sizeof...(T) < MAX_TYPES, "too many types");
+	template<typename... QueryParameters> struct Query {
+			static_assert(sizeof...(QueryParameters) < archetypal::MAX_TYPES, "too many types");
+
+			/// The type to pass to systems using this as a parameter.
+			using PassedValue = Query<QueryParameters...>;
 
 			/// A bitset, one bit for each type, declaring
 			/// whether or not it must be accessed uniquely.
-			std::bitset<MAX_TYPES> m_unique_set;
+			std::bitset<archetypal::MAX_TYPES> m_unique_set;
 
 			/// The types this query contains.
-			TypeSet m_contained_types;
+			archetypal::TypeSet m_contained_types;
 
 			/// Handler for components.
 			template<typename C> void inner(Badge<Component<C>>, size_t index) {
@@ -52,9 +54,9 @@ namespace ecs {
 			/// in a recognised wrapper type.
 			template<typename C> void inner(Badge<C>, size_t) = delete;
 
-			Query() : m_contained_types(TypeSet::create()) {
+			Query() : m_contained_types(archetypal::TypeSet::create()) {
 				size_t index = 0;
-				(inner(Badge<T>(), index++), ...);
+				(inner(Badge<QueryParameters>(), index++), ...);
 			}
 
 			BorrowState borrow(size_t index) {
@@ -62,6 +64,10 @@ namespace ecs {
 					return BorrowState::Unique;
 				else
 					return BorrowState::Shared;
+			}
+
+			static PassedValue value_from_world(World&) {
+				return Query();
 			}
 	};
 

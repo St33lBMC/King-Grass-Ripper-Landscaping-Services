@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <algorithm>
 #include <concepts>
 #include <cstdint>
 #include <cstdlib>
@@ -13,6 +14,7 @@
 #include <glm/ext/scalar_common.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/fwd.hpp>
+#include <glm/gtc/random.hpp>
 #include <glm/matrix.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
@@ -21,6 +23,7 @@
 
 //borrowed shader/obj parsing
 #include "Game.h"
+#include "ecs/archetypal/Archetype.h"
 #include "gl_wrapper/texture/Texture.h"
 #include "graphics/Model.h"
 #include "graphics/image/Image.h"
@@ -43,14 +46,15 @@
 #include <sstream>
 #include <vector>
 
-#include "ecs/Archetype.h"
 #include "ecs/Query.h"
+#include "ecs/System.h"
+#include "ecs/World.h"
+#include "ecs/archetypal/Archetype.h"
 #include "gl_wrapper/shader/Shader.h"
 #include "gl_wrapper/shader/UniformImpl.h"
 #include "graphics/text/Freetype.h"
 #include "utils/Camera.h"
 #include "utils/json/Parser.h"
-
 using namespace gl_wrapper;
 using namespace utils;
 
@@ -146,49 +150,10 @@ int main(void) {
 			float g;
 	};
 
-	ecs::Archetype a = ecs::Archetype::create<int, long>();
+	ecs::archetypal::Archetype a = ecs::archetypal::Archetype::create<int, long>();
 	a.add(4, 5l);
 	a.add(6l, 7);
 	a.add(9l, 21);
-
-	ecs::Query<ecs::Component<int&>, ecs::Component<long const&>> q;
-
-	std::unordered_set<int> ints;
-	std::unordered_set<long> longs;
-
-	a.satisfy(q, [&ints, &longs](int& integer, long const& longerger) {
-		ints.insert(integer);
-		longs.insert(longerger);
-	});
-
-	fmt::print("Longs: {}\n", longs.size());
-
-	// ecs::Archetype archetype = ecs::Archetype::create<Sheezer, int>();
-
-	// archetype.add(4, std::move(Sheezer {.g = 5.65}));
-
-	// archetype.add(7, std::move(Sheezer {.g = 5.21}));
-
-	// archetype.add(3, std::move(Sheezer {.g = 5.635}));
-
-	// ecs::Query<ecs::Component<int const&>> query;
-
-	// archetype.satisfy(query, [](int const& value) {
-	// 	fmt::print("Value: {}\n", value);
-	// });
-
-	// ecs::Archetype archetype2 = ecs::Archetype::create<Sheezer>();
-
-	// archetype2.add(std::move(Sheezer {.g = 3.65}));
-
-	// archetype2.add(std::move(Sheezer {.g = 3.21}));
-
-	// archetype2.add(std::move(Sheezer {.g = 3.635}));
-
-	// ecs::World world({archetype, archetype2});
-
-	// world.query<Sheezer>([](Sheezer& x) -> void { fmt::print("got: {0:.6f}\n", x.g); });
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	using namespace graphics;
 
@@ -214,8 +179,6 @@ int main(void) {
 	// auto tex = std::make_shared<Texture2D>();
 	// tex->upload_image(graphics::ImageRef<graphics::PixelFormat::RGBA8888> { img });
 
-	Game game((Window(window)));
-	game.camera().m_aspect = 1024.f / 768.f;
 	models::ObjectModel cube_obj("../assets/models/cube.obj");
 	graphics::Model cube(graphics::Material(glm::vec4(0, 1, 0, 1), tex));
 	cube_obj.upload_to(cube);
@@ -224,13 +187,28 @@ int main(void) {
 	models::ObjectModel book_obj("../assets/models/book.obj");
 	graphics::Model book(graphics::Material(glm::vec4(1, 0, 0, 1), tex));
 	book_obj.upload_to(book);
-	book.transform() = glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0));
 
-	std::vector<graphics::Model> models;
-	models.push_back(std::move(cube));
-	models.push_back(std::move(book));
+	// std::vector<graphics::Model> models;
+	// models.push_back(std::move(cube));
+	// models.push_back(std::move(book));
 
-	game.loop(std::move(models));
+	ecs::World world;
+	world.add_system<ecs::Query<ecs::Component<glm::vec3&>>>(
+		[](ecs::CommandQueue&, ecs::WorldView world, ecs::Query<ecs::Component<glm::vec3&>> query) {
+			world.satisfy(query, [](glm::vec3& position) {
+				//fmt::print("this does indeed have side effects\n");
+				position += glm::sphericalRand(0.1);
+			});
+		}
+	);
+
+	world.add<glm::vec3, graphics::Model>(glm::vec3(0, 0, 1), std::forward<graphics::Model&&>(cube));
+	world.add<glm::vec3, graphics::Model>(glm::vec3(1, 0, 0), std::forward<graphics::Model&&>(book));
+
+	Game game((Window(window)), std::move(world));
+	game.camera().m_aspect = 1024.f / 768.f;
+
+	game.loop();
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 
