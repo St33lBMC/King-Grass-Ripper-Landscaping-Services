@@ -131,7 +131,7 @@ namespace ecs::archetypal {
 						if (prev_stored > 0) {
 							// deallocate the old memory, if necessary
 							void* old_ptr = m_data[data_slot].m_data_ptr;
-							memcpy(new_ptr, old_ptr, sizeof(T) * prev_stored);
+							memcpy((void*)new_ptr, old_ptr, sizeof(T) * prev_stored);
 							free(reinterpret_cast<T*>(old_ptr));
 						}
 						new (&new_ptr[m_num_stored - 1]) T(std::move(value));

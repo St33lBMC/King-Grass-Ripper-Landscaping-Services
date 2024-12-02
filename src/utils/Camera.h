@@ -13,7 +13,12 @@ namespace utils {
 			float m_yaw = {0.0};
 			glm::vec3 m_position;
 
-			explicit Camera(glm::vec3 position) : m_position(position) {}
+			explicit Camera(glm::vec3 position) :
+				m_fov(35.0),
+				m_aspect(1.0),
+				m_pitch(0.0),
+				m_yaw(0.0),
+				m_position(position) {}
 
 			/// A direction vector representing forwards, from
 			/// the POV of this camera.
