@@ -79,7 +79,6 @@ namespace ecs {
 			}
 
 			template<typename... T, typename Handler> void satisfy(Query<T...>& query, Handler handler) {
-				TypeSet set = TypeSet::create<T...>();
 				for (auto& [key, archetype] : m_archetypes) {
 					if (query.m_contained_types.is_subset_of(key)) {
 						archetype.satisfy(query, handler);
