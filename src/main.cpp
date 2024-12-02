@@ -150,10 +150,10 @@ int main(void) {
 			float g;
 	};
 
-	ecs::archetypal::Archetype a = ecs::archetypal::Archetype::create<int, long>();
-	a.add(4, 5l);
-	a.add(6l, 7);
-	a.add(9l, 21);
+	// ecs::archetypal::Archetype a = ecs::archetypal::Archetype::create<int, long>();
+	// a.add(4, 5l);
+	// a.add(6l, 7);
+	// a.add(9l, 21);
 
 	using namespace graphics;
 
@@ -193,22 +193,16 @@ int main(void) {
 	// models.push_back(std::move(book));
 
 	ecs::World world;
-	world.add_system<ecs::Query<ecs::Component<glm::vec3&>>>(
-		[](ecs::CommandQueue&, ecs::WorldView world, ecs::Query<ecs::Component<glm::vec3&>> query) {
-			world.satisfy(query, [](glm::vec3& position) {
-				//fmt::print("this does indeed have side effects\n");
-				position += glm::sphericalRand(0.1);
-			});
-		}
-	);
+	world.add_system<ecs::Query<ecs::Component<glm::vec3&>>>([](ecs::CommandQueue&, ecs::WorldView world, auto query) {
+		world.satisfy(query, [](glm::vec3& position) { position += glm::sphericalRand(0.01); });
+	});
 
 	world.add<glm::vec3, graphics::Model>(glm::vec3(0, 0, 1), std::forward<graphics::Model&&>(cube));
 	world.add<glm::vec3, graphics::Model>(glm::vec3(1, 0, 0), std::forward<graphics::Model&&>(book));
-
 	Game game((Window(window)), std::move(world));
 	game.camera().m_aspect = 1024.f / 768.f;
-
 	game.loop();
+
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 

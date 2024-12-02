@@ -75,6 +75,16 @@ namespace ecs::archetypal {
 		public:
 			using SlotIndex = size_t;
 
+			Archetype(Archetype const& other) = delete;
+			Archetype& operator=(Archetype&) = delete;
+
+			Archetype(Archetype&& other) : m_contained_types(other.m_contained_types) {
+				m_data = other.m_data;
+				m_num_stored = other.m_num_stored;
+				other.m_num_stored = 0;
+				other.m_contained_types = TypeSet::empty();
+			}
+
 			template<typename... T, typename Handler> void satisfy(Query<T...> query, Handler handler) {
 				VERIFY(query.m_contained_types.is_subset_of(m_contained_types), "Bad query");
 

@@ -43,7 +43,7 @@ namespace ecs {
 
 			using System = std::function<void(World&)>;
 
-			std::unordered_map<TypeSet, Archetype> m_archetypes = {};
+			std::unordered_map<TypeSet, Archetype> m_archetypes;
 
 			Arena<EntityEntry> m_entities;
 
@@ -54,10 +54,16 @@ namespace ecs {
 			using Entity = Arena<EntityEntry>::ArenaIndex;
 
 		public:
+			World() = default;
+			World(World&) = delete;
+			World(World&&) = default;
+			World& operator=(World&) = delete;
+
 			template<typename... Components> Entity add(Components&&... components) {
 				TypeSet set = TypeSet::create<Components...>();
 
-				auto& [_, archetype] = *m_archetypes.try_emplace(set, Archetype::create<Components...>()).first;
+				auto& [_, archetype] =
+					*m_archetypes.try_emplace(set, std::move(Archetype::create<Components...>())).first;
 
 				Archetype::SlotIndex index = archetype.add(std::forward<Components&&>(components)...);
 

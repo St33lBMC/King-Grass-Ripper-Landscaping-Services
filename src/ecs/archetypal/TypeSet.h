@@ -70,6 +70,10 @@ namespace ecs::archetypal {
 				return TypeSet(std::span(args, num_types));
 			}
 
+			static constexpr TypeSet empty() {
+				return TypeSet::create<>();
+			}
+
 			void add(std::type_index addition) {
 				if (m_num_contained_types >= MAX_TYPES) {
 					PANIC("too many types. cannot add");

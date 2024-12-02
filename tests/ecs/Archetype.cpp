@@ -10,55 +10,55 @@
 
 using namespace ecs::archetypal;
 
-// TEST_CASE("archetype query", "[ecs][Archetype]") {
-// 	Archetype a = Archetype::create<int, long>();
-// 	a.add(4, 5l);
-// 	a.add(6l, 7);
-// 	a.add(9l, 21);
+TEST_CASE("archetype query", "[ecs][Archetype]") {
+	Archetype a = Archetype::create<int, long>();
+	a.add(4, 5l);
+	a.add(6l, 7);
+	a.add(9l, 21);
 
-// 	ecs::Query<ecs::Component<int&>, ecs::Component<long const&>> q;
+	ecs::Query<ecs::Component<int&>, ecs::Component<long const&>> q;
 
-// 	std::unordered_set<int> ints;
-// 	std::unordered_set<long> longs;
+	std::unordered_set<int> ints;
+	std::unordered_set<long> longs;
 
-// 	a.satisfy(q, [&ints, &longs](int& integer, long const& longerger) {
-// 		ints.insert(integer);
-// 		longs.insert(longerger);
-// 	});
+	a.satisfy(q, [&ints, &longs](int& integer, long const& longerger) {
+		ints.insert(integer);
+		longs.insert(longerger);
+	});
 
-// 	REQUIRE(ints.contains(4));
-// 	REQUIRE(ints.contains(7));
-// 	REQUIRE(ints.contains(21));
+	REQUIRE(ints.contains(4));
+	REQUIRE(ints.contains(7));
+	REQUIRE(ints.contains(21));
 
-// 	REQUIRE(longs.contains(9l));
-// 	REQUIRE(longs.contains(6l));
-// 	REQUIRE(longs.contains(5l));
-// }
+	REQUIRE(longs.contains(9l));
+	REQUIRE(longs.contains(6l));
+	REQUIRE(longs.contains(5l));
+}
 
-// TEST_CASE("archetype query subset", "[ecs][Archetype]") {
-// 	Archetype a = Archetype::create<int, long>();
-// 	a.add(4, 5l);
-// 	a.add(6l, 7);
-// 	a.add(9l, 21);
+TEST_CASE("archetype query subset", "[ecs][Archetype]") {
+	Archetype a = Archetype::create<int, long>();
+	a.add(4, 5l);
+	a.add(6l, 7);
+	a.add(9l, 21);
 
-// 	ecs::Query<ecs::Component<int&>> q;
+	ecs::Query<ecs::Component<int&>> q;
 
-// 	std::unordered_set<int> ints;
+	std::unordered_set<int> ints;
 
-// 	a.satisfy(q, [&ints](int& integer) { ints.insert(integer); });
+	a.satisfy(q, [&ints](int& integer) { ints.insert(integer); });
 
-// 	REQUIRE(ints.contains(4));
-// 	REQUIRE(ints.contains(7));
-// 	REQUIRE(ints.contains(21));
-// }
+	REQUIRE(ints.contains(4));
+	REQUIRE(ints.contains(7));
+	REQUIRE(ints.contains(21));
+}
 
-// TEST_CASE("archetype unsatisfiable query", "[ecs][Archetype][!shouldfail]") {
-// 	Archetype a = Archetype::create<long>();
+TEST_CASE("archetype unsatisfiable query", "[ecs][Archetype][!shouldfail]") {
+	Archetype a = Archetype::create<long>();
 
-// 	ecs::Query<ecs::Component<int&>> q;
+	ecs::Query<ecs::Component<int&>> q;
 
-// 	a.satisfy(q, [](int&) { (void)0; });
-// }
+	a.satisfy(q, [](int&) { (void)0; });
+}
 
 TEST_CASE("archetype destructors", "[ecs][Archetype]") {
 	struct Cool {

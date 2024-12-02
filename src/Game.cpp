@@ -50,7 +50,7 @@ std::string get_file_contents(const char* filename) {
 Game::Game(Window&& window, ecs::World&& world) :
 	m_camera(glm::vec3(0, 0, 0)),
 	m_window(std::move(window)),
-	m_world(world) {
+	m_world(std::move(world)) {
 	auto vertex_shader = Shader(ShaderType::Vertex);
 	auto fragment_shader = Shader(ShaderType::Fragment);
 

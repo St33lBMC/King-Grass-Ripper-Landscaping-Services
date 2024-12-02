@@ -7,10 +7,10 @@ namespace utils {
 
 	class Camera {
 		public:
-			float m_fov = 35.0f;
-			float m_aspect = 1.0;
-			float m_pitch = 0.0;
-			float m_yaw = 0.0;
+			float m_fov = {35.0f};
+			float m_aspect = {1.0};
+			float m_pitch = {0.0};
+			float m_yaw = {0.0};
 			glm::vec3 m_position;
 
 			explicit Camera(glm::vec3 position) : m_position(position) {}
