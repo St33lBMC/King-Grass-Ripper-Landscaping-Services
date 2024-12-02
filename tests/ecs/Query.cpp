@@ -5,10 +5,10 @@
 
 using namespace ecs::archetypal;
 
-// TEST_CASE("query construction correct", "[ecs][Query]") {
-// 	ecs::Query<ecs::Component<int&>, ecs::Component<long const&>> q;
+TEST_CASE("query construction correct", "[ecs][Query]") {
+	ecs::Query<ecs::Component<int&>, ecs::Component<long const&>> q;
 
-// 	REQUIRE(q.m_contained_types == TypeSet::create<int, long>());
-// 	REQUIRE(q.m_unique_set[0]);
-// 	REQUIRE_FALSE(q.m_unique_set[1]);
-// }
+	REQUIRE(q.m_contained_types == TypeSet::create<int, long>());
+	REQUIRE(q.m_unique_set[0]);
+	REQUIRE_FALSE(q.m_unique_set[1]);
+}
