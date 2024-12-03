@@ -16,6 +16,7 @@ find_package(Freetype MODULE REQUIRED)
 
 include_directories("src/")
 include_directories("src/tracy/")
+include_directories("tests/")
 
 add_definitions(-DTRACY_ENABLE)
 
@@ -65,9 +66,12 @@ add_executable(tests
     tests/ecs/Query.cpp
     tests/ecs/Archetype.cpp
     tests/ecs/Arena.cpp
+    tests/graphics/Image.cpp
+    tests/main.cpp
 
     src/ecs/archetypal/TypeSet.cpp
     src/ecs/archetypal/Archetype.cpp
+    src/graphics/image/Image.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain ${libraries})
 target_compile_definitions(tests PUBLIC TEST_MODE)
