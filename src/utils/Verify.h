@@ -27,4 +27,4 @@ panic_internal(std::experimental::source_location s = std::experimental::source_
 		fmt::print("Verification failed! ");                                                                           \
 		PANIC(__VA_ARGS__)                                                                                             \
 	}
-#define VERIFY_NOT_REACHED() VERIFY(0)
+#define VERIFY_NOT_REACHED() VERIFY(0, "")
