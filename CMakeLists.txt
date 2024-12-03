@@ -65,6 +65,7 @@ add_executable(tests
     tests/ecs/Query.cpp
     tests/ecs/Archetype.cpp
     tests/ecs/Arena.cpp
+    tests/ecs/World.cpp
 
     src/ecs/archetypal/TypeSet.cpp
     src/ecs/archetypal/Archetype.cpp
