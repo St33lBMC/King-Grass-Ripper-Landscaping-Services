@@ -4,23 +4,6 @@
 
 namespace ecs::archetypal {
 
-	void Archetype::ComponentStore::borrow_as(BorrowState state) {
-		VERIFY(can_borrow_with(m_state, state), "Trying to borrow when not permitted");
-		m_state = state;
-		if (m_state == BorrowState::Shared)
-			m_borrow_count++;
-	}
-
-	void Archetype::ComponentStore::release_borrow() {
-		VERIFY(m_state != BorrowState::None, "already unborrowed");
-		if (m_state == BorrowState::Shared) {
-			if (--m_borrow_count > 0) {
-				return; // still shared borrow
-			}
-		}
-		m_state = BorrowState::None;
-	}
-
 	Archetype::~Archetype() {
 		fmt::print("Destructing. {}\n", m_contained_types.size());
 		for (size_t type_iteration = 0; type_iteration < m_contained_types.size(); type_iteration++) {

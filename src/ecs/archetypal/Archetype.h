@@ -22,9 +22,7 @@ namespace ecs::archetypal {
 					/// Type-erased pointer.
 					void* m_data_ptr = nullptr;
 					/// The borrow state of this component.
-					BorrowState m_state = BorrowState::None;
-					/// The number of shared borrows.
-					size_t m_borrow_count = 0;
+					BorrowTracker m_borrow_tracker;
 					/// The stride of this type.
 					size_t m_stride;
 					/// This type's destructor.
@@ -42,10 +40,6 @@ namespace ecs::archetypal {
 						}
 						return store;
 					}
-
-					void borrow_as(BorrowState state);
-
-					void release_borrow();
 			};
 
 			friend class World;
@@ -89,7 +83,7 @@ namespace ecs::archetypal {
 				VERIFY(query.m_contained_types.is_subset_of(m_contained_types), "Bad query");
 
 				for (size_t i = 0; i < query.m_contained_types.size(); i++) {
-					m_data[i].borrow_as(query.borrow(i));
+					m_data[i].m_borrow_tracker.borrow_as(query.borrow(i));
 				}
 
 				for (size_t i = 0; i < m_num_stored; i++) {
@@ -97,7 +91,7 @@ namespace ecs::archetypal {
 				}
 
 				for (size_t i = 0; i < query.m_contained_types.size(); i++) {
-					m_data[i].release_borrow();
+					m_data[i].m_borrow_tracker.release_borrow();
 				}
 			}
 
@@ -121,7 +115,7 @@ namespace ecs::archetypal {
 						size_t data_slot = m_contained_types.index_of(typeid(T));
 
 						// check that it is not uniquely borrowed
-						if (m_data[data_slot].m_state == BorrowState::Unique) {
+						if (m_data[data_slot].m_borrow_tracker.state() == BorrowState::Unique) {
 							PANIC("trying to mutate uniquely-borrowed component");
 						}
 
