@@ -57,6 +57,7 @@ namespace graphics {
 			void draw(shader::Program& program, glm::mat4 const& additional_transform) const {
 				ZoneScoped;
 				TracyGpuZone("model draw");
+				program.use_program();
 				program.set_uniform("model_matrix", transform() * additional_transform);
 				m_material.upload_uniform(program, "material");
 				m_vao.bind();

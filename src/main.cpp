@@ -123,6 +123,7 @@ GLFWwindow* initialize() {
 	glewInit();
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
