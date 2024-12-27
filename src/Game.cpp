@@ -11,17 +11,21 @@
 #include "models/ObjectModel.h"
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
+#include "utils/FileAccess.h"
 
 void Game::loop() {
 	do {
 		FrameMark;
 		m_movement.process_movement(m_window, m_camera);
 		m_shader_program.set_uniform("view_matrix", m_camera.view());
+		m_particles.shader().set_uniform("view_matrix", m_camera.view());
 
 		// Clear the screen.
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		m_world.run();
+
+		m_particles.draw_all();
 
 		// Swap buffers
 		m_window.swap_buffers();
@@ -31,20 +35,6 @@ void Game::loop() {
 	} // Check if the window was closed
 	// escape key functionality changed to unlocking cursor
 	while (!m_window.should_close());
-}
-
-std::string get_file_contents(const char* filename) {
-	std::ifstream in(filename, std::ios::in | std::ios::binary);
-	if (in) {
-		std::string contents;
-		in.seekg(0, std::ios::end);
-		contents.resize(in.tellg());
-		in.seekg(0, std::ios::beg);
-		in.read(&contents[0], contents.size());
-		in.close();
-		return (contents);
-	}
-	PANIC("read of {} failed: {}", filename, std::strerror(errno));
 }
 
 Game::Game(Window&& window, ecs::World&& world) :
@@ -74,6 +64,8 @@ Game::Game(Window&& window, ecs::World&& world) :
 	glm::mat4 model_matrix = glm::mat4(1.0);
 	m_shader_program.set_uniform("model_matrix", model_matrix);
 	m_shader_program.set_uniform("projection_matrix", m_camera.perspective());
+
+	m_particles.shader().set_uniform("projection_matrix", m_camera.perspective());
 
 	m_world.add_system<ecs::Query<ecs::Component<glm::vec3 const&>, ecs::Component<graphics::Model const&>>>(
 		[this](
