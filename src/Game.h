@@ -6,11 +6,11 @@
 #include "ecs/World.h"
 #include "gl_wrapper/shader/Shader.h"
 #include "graphics/Model.h"
+#include "graphics/ParticleRenderer.h"
 #include "models/ObjectModel.h"
 #include "utils/Camera.h"
 #include "utils/Movement.h"
 #include "utils/Window.h"
-
 using namespace utils;
 using namespace gl_wrapper::shader;
 
@@ -19,6 +19,7 @@ class Game {
 		Program m_shader_program;
 		Window m_window;
 		Movement m_movement;
+		graphics::ParticleRenderer m_particles;
 		ecs::World m_world;
 
 	public:

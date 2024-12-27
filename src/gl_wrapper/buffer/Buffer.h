@@ -1,3 +1,4 @@
+#pragma once
 #include <GL/glew.h>
 
 #include <cstddef>
@@ -11,7 +12,7 @@ namespace gl_wrapper::buffer {
 
 	enum class BufferBindingTarget : GLenum { ArrayBuffer = GL_ARRAY_BUFFER, IndexBuffer = GL_ELEMENT_ARRAY_BUFFER };
 
-	enum class UsageHint : GLenum { Static = GL_STATIC_DRAW };
+	enum class UsageHint : GLenum { Static = GL_STATIC_DRAW, Dynamic = GL_DYNAMIC_DRAW };
 
 	enum class BufferIV : GLenum { BufferSize = GL_BUFFER_SIZE, BufferUsage = GL_BUFFER_USAGE };
 
