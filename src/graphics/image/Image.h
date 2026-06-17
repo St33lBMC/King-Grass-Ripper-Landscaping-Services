@@ -32,19 +32,23 @@ namespace graphics::image {
 			std::span<uint8_t> m_data;
 
 		public:
-			size_t width() {
+			size_t width() const {
 				return m_width;
 			}
 
-			size_t height() {
+			size_t height() const {
 				return m_height;
 			}
 
-			size_t num_pixels() {
+			size_t num_pixels() const {
 				return m_width * m_height;
 			}
 
 			std::span<uint8_t> data() {
+				return m_data;
+			}
+
+			std::span<const uint8_t> data() const {
 				return m_data;
 			}
 
@@ -64,7 +68,7 @@ namespace graphics::image {
 				m_width(width),
 				m_height(height),
 				m_data(new uint8_t[data.size()]) {
-				VERIFY(width * height * bytes_per_pixel(T) == data.size());
+				VERIFY(width * height * bytes_per_pixel(T) == data.size(), "");
 				std::memcpy(m_data.get(), data.data(), data.size_bytes());
 			}
 
