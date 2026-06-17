@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 
+#include "ecs/ResourceStorage.h"
 #include "ecs/System.h"
 #include "ecs/archetypal/Archetype.h"
 #include "ecs/archetypal/Arena.h"
@@ -51,6 +52,8 @@ namespace ecs {
 
 			CommandQueue m_command_queue;
 
+			ResourceStorage m_resources;
+
 			using Entity = Arena<EntityEntry>::ArenaIndex;
 
 		public:
@@ -58,6 +61,10 @@ namespace ecs {
 			World(World&) = delete;
 			World(World&&) = default;
 			World& operator=(World&) = delete;
+
+			ResourceStorage& resources() {
+				return m_resources;
+			}
 
 			template<typename... Components> Entity add(Components&&... components) {
 				TypeSet set = TypeSet::create<Components...>();
@@ -79,7 +86,6 @@ namespace ecs {
 			}
 
 			template<typename... T, typename Handler> void satisfy(Query<T...>& query, Handler handler) {
-				TypeSet set = TypeSet::create<T...>();
 				for (auto& [key, archetype] : m_archetypes) {
 					if (query.m_contained_types.is_subset_of(key)) {
 						archetype.satisfy(query, handler);
